@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
 import axios from "axios";
@@ -17,11 +17,12 @@ const StudentDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isLoaded || !isSignedIn) return;
-    fetchData();
-  }, [isLoaded, isSignedIn]);
+  if (!isLoaded || !isSignedIn) return;
+  fetchData();
+}, [isLoaded, isSignedIn, fetchData]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
+
     try {
       const token = await getToken();
 
@@ -45,7 +46,8 @@ const StudentDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [getToken, navigate]);
+
 
   const handleLogout = async () => {
   try {

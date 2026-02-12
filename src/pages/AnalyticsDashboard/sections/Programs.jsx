@@ -21,41 +21,41 @@ const Programs = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isLoaded || !isSignedIn) return;
+  if (!isLoaded || !isSignedIn) return;
 
-    const fetchProgramsData = async () => {
-      try {
-        const token = await getToken();
+  const fetchProgramsData = async () => {
+    try {
+      const token = await getToken();
 
-        const countRes = await axios.get(
-          `${API_URL}/api/analytics/programs/count`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+      const countRes = await axios.get(
+        `${API_URL}/api/analytics/programs/count`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-        const rateRes = await axios.get(
-          `${API_URL}/api/analytics/programs/employment-rate`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+      const rateRes = await axios.get(
+        `${API_URL}/api/analytics/programs/employment-rate`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-        setProgramCounts(countRes.data || []);
-        setEmploymentRates(rateRes.data || []);
-      } catch (err) {
-        console.error("Failed to load programs analytics", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+      setProgramCounts(countRes.data || []);
+      setEmploymentRates(rateRes.data || []);
+    } catch (err) {
+      console.error("Failed to load programs analytics", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchProgramsData();
-  }, [isLoaded, isSignedIn]);
+  fetchProgramsData();
+}, [isLoaded, isSignedIn, getToken]);
 
   if (loading) {
     return <p className="text-slate-500">Loading programs analytics…</p>;

@@ -26,37 +26,38 @@ const Employment = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isLoaded || !isSignedIn) return;
+  if (!isLoaded || !isSignedIn) return;
 
-    const fetchEmploymentData = async () => {
-      try {
-        const token = await getToken();
+  const fetchEmploymentData = async () => {
+    try {
+      const token = await getToken();
 
-        const statusRes = await axios.get(
-          `${API_URL}/api/analytics/employment/status`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+      const statusRes = await axios.get(
+        `${API_URL}/api/analytics/employment/status`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-        const employersRes = await axios.get(
-          `${API_URL}/api/analytics/top-employers`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+      const employersRes = await axios.get(
+        `${API_URL}/api/analytics/top-employers`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-        setStatusData(statusRes.data || []);
-        setTopEmployers(employersRes.data || []);
-      } catch (err) {
-        console.error("Failed to load employment analytics", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+      setStatusData(statusRes.data || []);
+      setTopEmployers(employersRes.data || []);
+    } catch (err) {
+      console.error("Failed to load employment analytics", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchEmploymentData();
-  }, [isLoaded, isSignedIn]);
+  fetchEmploymentData();
+}, [isLoaded, isSignedIn, getToken]);
+
   if (loading) {
     return <p className="text-slate-500">Loading employment analytics…</p>;
   }

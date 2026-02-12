@@ -21,36 +21,36 @@ const Industry = () => {
   const [domains, setDomains] = useState([]);
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
-    if (!isLoaded || !isSignedIn) return;
+  if (!isLoaded || !isSignedIn) return;
 
-    const fetchIndustryData = async () => {
-      try {
-        const token = await getToken();
+  const fetchIndustryData = async () => {
+    try {
+      const token = await getToken();
 
-        const domainsRes = await axios.get(
-          `${API_URL}/api/analytics/industry/domains`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+      const domainsRes = await axios.get(
+        `${API_URL}/api/analytics/industry/domains`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-        const rolesRes = await axios.get(
-          `${API_URL}/api/analytics/industry/roles`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+      const rolesRes = await axios.get(
+        `${API_URL}/api/analytics/industry/roles`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-        setDomains(domainsRes.data || []);
-        setRoles(rolesRes.data || []);
-      } catch (err) {
-        console.error("Failed to load industry analytics", err);
-        navigate("/");
-      } finally {
-        setLoading(false);
-      }
-    };
+      setDomains(domainsRes.data || []);
+      setRoles(rolesRes.data || []);
+    } catch (err) {
+      console.error("Failed to load industry analytics", err);
+      navigate("/");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchIndustryData();
-  }, [isLoaded, isSignedIn]);
+  fetchIndustryData();
+}, [isLoaded, isSignedIn, getToken, navigate]);
+
   if (loading) {
     return <p className="text-slate-500">Loading industry analytics…</p>;
   }

@@ -46,32 +46,32 @@ const ProfilePage = () => {
   });
 
   useEffect(() => {
-    if (!isLoaded || !isSignedIn) return;
+  if (!isLoaded || !isSignedIn) return;
 
-    const fetchData = async () => {
-      try {
-        const token = await getToken();
+  const fetchData = async () => {
+    try {
+      const token = await getToken();
 
-        const [profileRes, userRes] = await Promise.all([
-          axios.get(`${API_URL}/api/alumni/${userId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get(`${API_URL}/api/auth/me`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
+      const [profileRes, userRes] = await Promise.all([
+        axios.get(`${API_URL}/api/alumni/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        axios.get(`${API_URL}/api/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
 
-        setProfile(profileRes.data);
-        setCurrentUser(userRes.data);
-      } catch (error) {
-        toast.error("Failed to load profile");
-      } finally {
-        setLoading(false);
-      }
-    };
+      setProfile(profileRes.data);
+      setCurrentUser(userRes.data);
+    } catch (error) {
+      toast.error("Failed to load profile");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchData();
-  }, [userId, isLoaded, isSignedIn]);
+  fetchData();
+}, [userId, isLoaded, isSignedIn, getToken]);
 
   const handleSendRequest = async () => {
     try {
