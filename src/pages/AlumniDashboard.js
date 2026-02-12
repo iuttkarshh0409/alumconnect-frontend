@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from "@clerk/clerk-react";
 import axios from 'axios';
@@ -27,9 +27,10 @@ const AlumniDashboard = () => {
   useEffect(() => {
     if (!isLoaded || !isSignedIn) return;
     fetchAllData();
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, fetchAllData]);
 
-  const fetchAllData = async () => {
+  const fetchAllData = useCallback(async () => {
+
     try {
       const token = await getToken();
 
@@ -71,7 +72,8 @@ const AlumniDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [getToken, navigate]);
+
 
   const fetchRequests = async () => {
     try {

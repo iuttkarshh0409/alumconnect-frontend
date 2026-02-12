@@ -13,30 +13,30 @@ const ProtectedRoute = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isLoaded) return;
+  if (!isLoaded) return;
 
-    if (!isSignedIn) {
+  if (!isSignedIn) {
+    navigate("/");
+    return;
+  }
+
+  const verify = async () => {
+    const token = await getToken();
+
+    try {
+      await axios.get(`${API_URL}/api/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setLoading(false);
+    } catch {
       navigate("/");
-      return;
     }
+  };
 
-    const verify = async () => {
-      const token = await getToken();
-
-      try {
-        await axios.get(`${API_URL}/api/auth/me`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setLoading(false);
-      } catch {
-        navigate("/");
-      }
-    };
-
-    verify();
-  }, [isLoaded, isSignedIn]);
+  verify();
+}, [isLoaded, isSignedIn, getToken, navigate]);
 
   if (loading) {
     return <div>Loading...</div>;
