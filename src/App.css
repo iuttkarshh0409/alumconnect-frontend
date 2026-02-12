@@ -1,0 +1,41 @@
+/* App.css - Clean, no universal transition */
+
+.App {
+  min-height: 100vh;
+  background: #F9F9F7;
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, #002147 0%, #0F3057 50%, #002147 100%);
+}
+
+.gold-accent {
+  background: linear-gradient(90deg, #CFB53B 0%, #E6D277 50%, #CFB53B 100%);
+}
+
+.card-shadow {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+.card-shadow-hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+/* Button transitions only */
+button {
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+/* Input focus transitions */
+input, textarea, select {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
