@@ -1,15 +1,21 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
-import axios from 'axios';
-import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Users, BookOpen, LogOut, Edit } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import MentorshipRequestCard from '@/components/MentorshipRequestCard';
+import axios from "axios";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Users, BookOpen, LogOut, Edit } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import MentorshipRequestCard from "@/components/MentorshipRequestCard";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -24,13 +30,8 @@ const AlumniDashboard = () => {
   const [editMode, setEditMode] = useState(false);
   const [profileUpdate, setProfileUpdate] = useState({});
 
-  useEffect(() => {
-    if (!isLoaded || !isSignedIn) return;
-    fetchAllData();
-  }, [isLoaded, isSignedIn, fetchAllData]);
-
+  // 🔥 DEFINE FIRST
   const fetchAllData = useCallback(async () => {
-
     try {
       const token = await getToken();
 
@@ -50,12 +51,12 @@ const AlumniDashboard = () => {
       setProfile(profileResponse.data);
 
       setProfileUpdate({
-        company: profileResponse.data.company || '',
-        job_domain: profileResponse.data.job_domain || '',
-        job_title: profileResponse.data.job_title || '',
-        skills: profileResponse.data.skills?.join(', ') || '',
-        bio: profileResponse.data.bio || '',
-        linkedin_url: profileResponse.data.linkedin_url || ''
+        company: profileResponse.data.company || "",
+        job_domain: profileResponse.data.job_domain || "",
+        job_title: profileResponse.data.job_title || "",
+        skills: profileResponse.data.skills?.join(", ") || "",
+        bio: profileResponse.data.bio || "",
+        linkedin_url: profileResponse.data.linkedin_url || "",
       });
 
       const requestsResponse = await axios.get(
@@ -67,13 +68,19 @@ const AlumniDashboard = () => {
 
       setRequests(requestsResponse.data);
     } catch (error) {
-      toast.error('Failed to load profile data');
-      navigate('/');
+      console.error(error);
+      toast.error("Failed to load profile data");
+      navigate("/");
     } finally {
       setLoading(false);
     }
   }, [getToken, navigate]);
 
+  // ✅ useEffect AFTER definition
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+    fetchAllData();
+  }, [isLoaded, isSignedIn, fetchAllData]);
 
   const fetchRequests = async () => {
     try {
@@ -86,7 +93,7 @@ const AlumniDashboard = () => {
       );
       setRequests(response.data);
     } catch {
-      toast.error('Failed to load requests');
+      toast.error("Failed to load requests");
     }
   };
 
@@ -97,9 +104,9 @@ const AlumniDashboard = () => {
       const updateData = {
         ...profileUpdate,
         skills: profileUpdate.skills
-          .split(',')
-          .map(s => s.trim())
-          .filter(s => s),
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => s),
       };
 
       await axios.put(
@@ -110,23 +117,13 @@ const AlumniDashboard = () => {
         }
       );
 
-      toast.success('Profile updated successfully!');
+      toast.success("Profile updated successfully!");
       setEditMode(false);
       fetchAllData();
     } catch {
-      toast.error('Failed to update profile');
+      toast.error("Failed to update profile");
     }
   };
-
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      navigate('/');
-    } catch {
-      toast.error('Logout failed');
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F9F9F7]">

@@ -12,17 +12,13 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const { getToken, isLoaded, isSignedIn, signOut } = useAuth();
+
   const [user, setUser] = useState(null);
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-  if (!isLoaded || !isSignedIn) return;
-  fetchData();
-}, [isLoaded, isSignedIn, fetchData]);
 
   const fetchData = useCallback(async () => {
-
     try {
       const token = await getToken();
 
@@ -41,6 +37,7 @@ const StudentDashboard = () => {
 
       setRequests(requestsRes.data);
     } catch (error) {
+      console.error(error);
       toast.error("Failed to load user data");
       navigate("/");
     } finally {
@@ -48,15 +45,20 @@ const StudentDashboard = () => {
     }
   }, [getToken, navigate]);
 
+  // ✅ useEffect AFTER fetchData
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+    fetchData();
+  }, [isLoaded, isSignedIn, fetchData]);
 
   const handleLogout = async () => {
-  try {
-    await signOut();
-    navigate("/", { replace: true });
-  } catch {
-    toast.error("Logout failed");
-  }
-};
+    try {
+      await signOut();
+      navigate("/", { replace: true });
+    } catch {
+      toast.error("Logout failed");
+    }
+  };
 
   if (loading) {
     return (
@@ -66,8 +68,13 @@ const StudentDashboard = () => {
     );
   }
 
-  const activeRequests = requests.filter(r => r.status === "pending").length;
-  const acceptedRequests = requests.filter(r => r.status === "accepted").length;
+  const activeRequests = requests.filter(
+    (r) => r.status === "pending"
+  ).length;
+
+  const acceptedRequests = requests.filter(
+    (r) => r.status === "accepted"
+  ).length;
 
   return (
     <div className="min-h-screen bg-[#F9F9F7]">
