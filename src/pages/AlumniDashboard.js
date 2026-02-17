@@ -124,6 +124,15 @@ const AlumniDashboard = () => {
       toast.error("Failed to update profile");
     }
   };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate("/", { replace: true });
+    } catch {
+      toast.error("Logout failed");
+    }
+  };
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F9F9F7]">
