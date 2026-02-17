@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
 import axios from "axios";
@@ -21,60 +21,65 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { getToken, isLoaded, isSignedIn, signOut } = useAuth();
+
   const [stats, setStats] = useState(null);
   const [topEmployers, setTopEmployers] = useState([]);
   const [skillDistribution, setSkillDistribution] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // 🔥 Define first
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      const token = await getToken();
+
+      const statsRes = await axios.get(
+        `${API_URL}/api/admin/stats`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setStats(statsRes.data);
+
+      const employersRes = await axios.get(
+        `${API_URL}/api/analytics/top-employers`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setTopEmployers(employersRes.data);
+
+      const skillsRes = await axios.get(
+        `${API_URL}/api/analytics/skill-distribution`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setSkillDistribution(skillsRes.data.slice(0, 10));
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Unauthorized or failed to load admin dashboard");
+      navigate("/", { replace: true });
+    } finally {
+      setLoading(false);
+    }
+  }, [getToken, navigate]);
+
+  // ✅ Effect AFTER function
   useEffect(() => {
     if (!isLoaded) return;
 
     if (!isSignedIn) {
-      navigate("/");
+      navigate("/", { replace: true });
       return;
     }
 
-    const fetchDashboardData = async () => {
-      try {
-        const token = await getToken();
-
-        const statsRes = await axios.get(
-          `${API_URL}/api/admin/stats`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setStats(statsRes.data);
-
-        const employersRes = await axios.get(
-          `${API_URL}/api/analytics/top-employers`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setTopEmployers(employersRes.data);
-
-        const skillsRes = await axios.get(
-          `${API_URL}/api/analytics/skill-distribution`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setSkillDistribution(skillsRes.data.slice(0, 10));
-      } catch (err) {
-        toast.error("Unauthorized or failed to load admin dashboard");
-        navigate("/");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchDashboardData();
-  }, [isLoaded, isSignedIn, getToken, navigate]);
+  }, [isLoaded, isSignedIn, fetchDashboardData, navigate]);
 
-    const handleLogout = async () => {
-  try {
-    await signOut();
-    navigate("/", { replace: true });
-  } catch (error) {
-    toast.error("Logout failed");
-  }
-};
-  
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate("/", { replace: true });
+    } catch {
+      toast.error("Logout failed");
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F9F9F7]">
@@ -82,16 +87,14 @@ const AdminDashboard = () => {
       </div>
     );
   }
-  
-  if (!isSignedIn) {
-  return null;
-}
+
+  if (!isSignedIn) return null;
 
   return (
     <div className="min-h-screen bg-[#F9F9F7]">
       <AdminHeader onLogout={handleLogout} />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <h2 className="font-serif text-4xl font-bold text-[#002147] mb-2">
           Admin Dashboard
         </h2>
