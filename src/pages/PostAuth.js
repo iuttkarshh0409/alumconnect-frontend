@@ -52,7 +52,7 @@ export default function PostAuth() {
     <div className="min-h-screen flex items-center justify-center bg-[#F9F9F7]">
       <div className="text-center">
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#002147] mx-auto mb-4"></div>
-        <p className="text-lg text-slate-600">Finishing sign-in…</p>
+        <p className="text-lg text-slate-600">Setting up your Profile...</p>
       </div>
     </div>
   );
