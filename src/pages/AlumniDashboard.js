@@ -7,14 +7,43 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Users, BookOpen, LogOut, Edit } from "lucide-react";
+import {
+  Users,
+  BookOpen,
+  LogOut,
+  Edit,
+  CheckCircle,
+  Clock,
+  Briefcase,
+  GraduationCap,
+  Mail,
+  Linkedin,
+  Plus,
+  ArrowUpRight,
+  User,
+  ShieldCheck,
+  RefreshCw,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { motion, AnimatePresence } from "framer-motion";
 import MentorshipRequestCard from "@/components/MentorshipRequestCard";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
@@ -29,8 +58,34 @@ const AlumniDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [profileUpdate, setProfileUpdate] = useState({});
+  const [isSyncing, setIsSyncing] = useState(false);
 
-  // 🔥 DEFINE FIRST
+  const handleSyncLinkedIn = async () => {
+    setIsSyncing(true);
+    try {
+      const token = await getToken();
+      const response = await axios.post(
+        `${API_URL}/api/alumni/sync-linkedin-photo`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.status === "success") {
+        // Append timestamp to force re-fetch (cache busting)
+        const updatedPicture = `${response.data.picture}?t=${Date.now()}`;
+        setUser({ ...user, picture: updatedPicture });
+        toast.success("Profile photo synced with LinkedIn!");
+      } else {
+        toast.info(response.data.message || "No new photo found on LinkedIn.");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to sync LinkedIn photo");
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   const fetchAllData = useCallback(async () => {
     try {
       const token = await getToken();
@@ -76,7 +131,6 @@ const AlumniDashboard = () => {
     }
   }, [getToken, navigate]);
 
-  // ✅ useEffect AFTER definition
   useEffect(() => {
     if (!isLoaded || !isSignedIn) return;
     fetchAllData();
@@ -120,6 +174,11 @@ const AlumniDashboard = () => {
       toast.success("Profile updated successfully!");
       setEditMode(false);
       fetchAllData();
+
+      // Proactively sync photo if LinkedIn URL is present
+      if (updateData.linkedin_url) {
+        handleSyncLinkedIn();
+      }
     } catch {
       toast.error("Failed to update profile");
     }
@@ -133,10 +192,22 @@ const AlumniDashboard = () => {
       toast.error("Logout failed");
     }
   };
+
+  const getInitials = (name) => {
+    if (!name) return "??";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F9F9F7]">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#002147]"></div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FDFDFD]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#002147] mb-4"></div>
+        <p className="text-[#002147] font-medium animate-pulse">Synchronizing your dashboard...</p>
       </div>
     );
   }
@@ -145,200 +216,403 @@ const AlumniDashboard = () => {
   const acceptedRequests = requests.filter(r => r.status === 'accepted').length;
 
   return (
-    <div className="min-h-screen bg-[#F9F9F7]">
-      {/* Header */}
-      <div className="bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="font-serif text-2xl font-bold text-[#002147]">AlumConnect</h1>
-          <Button
-            data-testid="logout-btn"
-            variant="ghost"
-            onClick={handleLogout}
-            className="text-slate-600 hover:text-[#002147]"
-          >
-            <LogOut className="w-5 h-5 mr-2" />
-            Logout
-          </Button>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
-        <div data-testid="alumni-dashboard" className="mb-8">
-          <h2 className="font-serif text-4xl font-bold text-[#002147] mb-2">Welcome, {user?.name}!</h2>
-          <p className="text-lg text-slate-600">{profile?.company} • {profile?.job_title}</p>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <div data-testid="stat-card-pending-requests" className="bg-white rounded-xl p-6 shadow-card border border-slate-100">
-            <div className="flex items-center justify-between mb-2">
-              <BookOpen className="w-8 h-8 text-[#CFB53B]" strokeWidth={1.5} />
-              <span className="text-3xl font-bold text-[#002147]">{pendingRequests}</span>
+    <div className="min-h-screen bg-[#FDFDFD] text-slate-900">
+      {/* HEADER */}
+      <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-[#002147] rounded-lg flex items-center justify-center text-white font-bold text-xl">
+              A
             </div>
-            <p className="text-slate-600 font-medium">Pending Requests</p>
+            <h1 className="font-serif text-2xl font-bold text-[#002147] tracking-tight">
+              AlumConnect
+            </h1>
           </div>
 
-          <div data-testid="stat-card-active-mentorships" className="bg-white rounded-xl p-6 shadow-card border border-slate-100">
-            <div className="flex items-center justify-between mb-2">
-              <Users className="w-8 h-8 text-[#4A6C6F]" strokeWidth={1.5} />
-              <span className="text-3xl font-bold text-[#002147]">{acceptedRequests}</span>
-            </div>
-            <p className="text-slate-600 font-medium">Active Mentorships</p>
-          </div>
-
-          <div className="bg-gradient-to-br from-[#002147] to-[#0F3057] rounded-xl p-6 shadow-card text-white">
-            <div className="flex items-center justify-between mb-2">
-              <Users className="w-8 h-8" strokeWidth={1.5} />
-              <span className="text-3xl font-bold">{profile?.is_verified ? '✓' : '⏳'}</span>
-            </div>
-            <p className="font-medium">{profile?.is_verified ? 'Verified Alumni' : 'Pending Verification'}</p>
-          </div>
-        </div>
-
-        {/* Profile Card */}
-        <div className="bg-white rounded-xl shadow-card border border-slate-100 p-8 mb-8">
-          <div className="flex justify-between items-start mb-6">
-            <h3 className="text-2xl font-serif font-semibold text-[#002147]">My Profile</h3>
-            <Dialog open={editMode} onOpenChange={setEditMode}>
-              <DialogTrigger asChild>
-                <Button data-testid="edit-profile-btn" variant="outline" className="rounded-full">
-                  <Edit className="w-4 h-4 mr-2" />
-                  Edit Profile
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Edit Profile</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4 mt-4">
-                  <div>
-                    <Label>Company</Label>
-                    <Input
-                      data-testid="edit-company-input"
-                      value={profileUpdate.company}
-                      onChange={(e) => setProfileUpdate({ ...profileUpdate, company: e.target.value })}
-                      placeholder="e.g., Google"
-                    />
-                  </div>
-                  <div>
-                    <Label>Job Domain</Label>
-                    <Input
-                      data-testid="edit-job-domain-input"
-                      value={profileUpdate.job_domain}
-                      onChange={(e) => setProfileUpdate({ ...profileUpdate, job_domain: e.target.value })}
-                      placeholder="e.g., SDE, PM, HR"
-                    />
-                  </div>
-                  <div>
-                    <Label>Job Title</Label>
-                    <Input
-                      data-testid="edit-job-title-input"
-                      value={profileUpdate.job_title}
-                      onChange={(e) => setProfileUpdate({ ...profileUpdate, job_title: e.target.value })}
-                      placeholder="e.g., Senior Software Engineer"
-                    />
-                  </div>
-                  <div>
-                    <Label>Skills (comma-separated)</Label>
-                    <Input
-                      data-testid="edit-skills-input"
-                      value={profileUpdate.skills}
-                      onChange={(e) => setProfileUpdate({ ...profileUpdate, skills: e.target.value })}
-                      placeholder="e.g., Python, JavaScript, React"
-                    />
-                  </div>
-                  <div>
-                    <Label>LinkedIn URL</Label>
-                    <Input
-                      data-testid="edit-linkedin-input"
-                      value={profileUpdate.linkedin_url}
-                      onChange={(e) => setProfileUpdate({ ...profileUpdate, linkedin_url: e.target.value })}
-                      placeholder="https://linkedin.com/in/yourprofile"
-                    />
-                  </div>
-                  <div>
-                    <Label>Bio</Label>
-                    <Textarea
-                      data-testid="edit-bio-textarea"
-                      value={profileUpdate.bio}
-                      onChange={(e) => setProfileUpdate({ ...profileUpdate, bio: e.target.value })}
-                      rows={4}
-                    />
-                  </div>
-                  <Button
-                    data-testid="save-profile-btn"
-                    onClick={handleUpdateProfile}
-                    className="w-full bg-[#002147] text-white hover:bg-[#002147]/90 rounded-full"
-                  >
-                    Save Changes
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <p className="text-sm text-slate-500 mb-1">Company</p>
-              <p className="text-lg font-medium text-[#002147]">{profile?.company || 'Not specified'}</p>
-            </div>
-            <div>
-              <p className="text-sm text-slate-500 mb-1">Job Title</p>
-              <p className="text-lg font-medium text-[#002147]">{profile?.job_title || 'Not specified'}</p>
-            </div>
-            <div>
-              <p className="text-sm text-slate-500 mb-1">Job Domain</p>
-              <p className="text-lg font-medium text-[#002147]">{profile?.job_domain || 'Not specified'}</p>
-            </div>
-            <div>
-              <p className="text-sm text-slate-500 mb-1">Graduation Year</p>
-              <p className="text-lg font-medium text-[#002147]">{profile?.graduation_year}</p>
-            </div>
-            <div className="md:col-span-2">
-              <p className="text-sm text-slate-500 mb-1">Skills</p>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {profile?.skills?.length > 0 ? (
-                  profile.skills.map((skill, idx) => (
-                    <span key={idx} className="bg-[#4A6C6F]/10 text-[#4A6C6F] px-3 py-1 rounded-full text-sm font-medium">
-                      {skill}
-                    </span>
-                  ))
-                ) : (
-                  <span className="text-slate-400">No skills added</span>
-                )}
+          <div className="flex items-center gap-4">
+            <div className="hidden sm:flex items-center gap-3 mr-4">
+              <div className="text-right">
+                <p className="text-sm font-bold text-[#002147] leading-none mb-1">{user?.name}</p>
+                <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Verified Alumni</p>
               </div>
+              <Avatar className="w-9 h-9 border border-slate-200 shadow-sm">
+                <AvatarImage src={user?.picture} />
+                <AvatarFallback className="bg-slate-50 text-[#002147] text-xs font-bold">
+                  {getInitials(user?.name)}
+                </AvatarFallback>
+              </Avatar>
             </div>
-            <div className="md:col-span-2">
-              <p className="text-sm text-slate-500 mb-1">Bio</p>
-              <p className="text-slate-700 leading-relaxed">{profile?.bio || 'No bio added'}</p>
-            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className="text-slate-600 hover:text-red-600 transition-colors"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </Button>
           </div>
         </div>
+      </header>
 
-        {/* Mentorship Requests */}
-        <div data-testid="mentorship-requests-section">
-          <h3 className="text-2xl font-serif font-semibold text-[#002147] mb-4">Mentorship Requests</h3>
-          {requests.length === 0 ? (
-            <div className="bg-white rounded-xl p-12 text-center shadow-card border border-slate-100">
-              <BookOpen className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <p className="text-slate-600">No mentorship requests yet</p>
+      <main className="max-w-7xl mx-auto px-6 py-12">
+        {/* WELCOME SECTION */}
+        <section className="mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <div>
+                <Badge variant="outline" className="mb-4 bg-[#003B5C]/5 text-[#003B5C] border-none px-3 py-1 font-semibold uppercase tracking-widest text-[10px]">
+                  Alumni Portal
+                </Badge>
+                <h2 className="font-serif text-5xl font-extrabold text-[#002147] mb-4 tracking-tight">
+                  Hello, {user?.name?.split(" ")[0]}!
+                </h2>
+                <div className="flex items-center gap-4 text-slate-500 font-medium">
+                  <span className="flex items-center gap-1.5">
+                    <Briefcase className="w-4 h-4" />
+                    {profile?.job_title} at {profile?.company}
+                  </span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-200"></span>
+                  <span className="flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-green-500" />
+                    {profile?.is_verified ? "Verified Alumni" : "Pending Verification"}
+                  </span>
+                </div>
+              </div>
+
+              <Dialog open={editMode} onOpenChange={setEditMode}>
+                <DialogTrigger asChild>
+                  <Button className="bg-[#002147] hover:bg-[#003366] text-white rounded-xl px-8 py-6 h-auto text-lg font-bold shadow-xl shadow-[#002147]/20 transition-all hover:scale-[1.02] active:scale-[0.98] group">
+                    <Edit className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" />
+                    Update Profile
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col p-0 rounded-3xl border-none shadow-2xl">
+                  <DialogHeader className="p-8 bg-[#002147] text-white">
+                    <DialogTitle className="text-2xl font-serif font-bold">Edit Professional Profile</DialogTitle>
+                    <DialogDescription className="text-white/60">
+                      Keep your professional details updated to help students find the right mentorship.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="p-8 overflow-y-auto space-y-6 flex-1">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Company</Label>
+                        <Input
+                          value={profileUpdate.company}
+                          onChange={(e) => setProfileUpdate({ ...profileUpdate, company: e.target.value })}
+                          placeholder="e.g., Google, Microsoft"
+                          className="rounded-xl border-slate-200"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Job Title</Label>
+                        <Input
+                          value={profileUpdate.job_title}
+                          onChange={(e) => setProfileUpdate({ ...profileUpdate, job_title: e.target.value })}
+                          placeholder="e.g., Senior Software Engineer"
+                          className="rounded-xl border-slate-200"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Job Domain</Label>
+                        <Input
+                          value={profileUpdate.job_domain}
+                          onChange={(e) => setProfileUpdate({ ...profileUpdate, job_domain: e.target.value })}
+                          placeholder="e.g., SDE, Product Management"
+                          className="rounded-xl border-slate-200"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">LinkedIn URL</Label>
+                        <Input
+                          value={profileUpdate.linkedin_url}
+                          onChange={(e) => setProfileUpdate({ ...profileUpdate, linkedin_url: e.target.value })}
+                          placeholder="https://linkedin.com/in/..."
+                          className="rounded-xl border-slate-200"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Skills (comma-separated)</Label>
+                      <Input
+                        value={profileUpdate.skills}
+                        onChange={(e) => setProfileUpdate({ ...profileUpdate, skills: e.target.value })}
+                        placeholder="e.g., React, Node.js, System Design"
+                        className="rounded-xl border-slate-200"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Short Bio</Label>
+                      <Textarea
+                        value={profileUpdate.bio}
+                        onChange={(e) => setProfileUpdate({ ...profileUpdate, bio: e.target.value })}
+                        rows={4}
+                        placeholder="Tell students how you can help them..."
+                        className="rounded-xl border-slate-200 resize-none"
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter className="p-6 bg-slate-50 border-t border-slate-100 rounded-b-3xl">
+                    <Button
+                      onClick={handleUpdateProfile}
+                      className="w-full bg-[#002147] hover:bg-[#003366] text-white rounded-xl h-12 font-bold shadow-lg shadow-[#002147]/10"
+                    >
+                      Save Professional Profile
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
-          ) : (
-            <div className="space-y-4">
-              {requests.map((request) => (
-                <MentorshipRequestCard
-                  key={request.request_id}
-                  request={request}
-                  userRole="alumni"
-                  onUpdate={fetchRequests}
-                />
-              ))}
+          </motion.div>
+        </section>
+
+        {/* STATS TILES */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Card className="border-slate-200 hover:border-[#CFB53B]/30 transition-all duration-300 group bg-white shadow-sm hover:shadow-lg">
+              <CardContent className="p-8 pb-6 flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">New Requests</p>
+                  <h3 className="text-4xl font-extrabold text-[#002147]">{pendingRequests}</h3>
+                </div>
+                <div className="w-14 h-14 bg-yellow-50 rounded-2xl flex items-center justify-center text-yellow-600 group-hover:scale-110 transition-transform">
+                  <BookOpen className="w-7 h-7" />
+                </div>
+              </CardContent>
+              <div className="px-8 pb-4">
+                <p className="text-xs text-slate-500 font-medium italic">Pending review from students</p>
+              </div>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <Card className="border-slate-200 hover:border-green-200 transition-all duration-300 group bg-white shadow-sm hover:shadow-lg">
+              <CardContent className="p-8 pb-6 flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Mentoring</p>
+                  <h3 className="text-4xl font-extrabold text-[#002147]">{acceptedRequests}</h3>
+                </div>
+                <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 group-hover:scale-110 transition-transform">
+                  <Users className="w-7 h-7" />
+                </div>
+              </CardContent>
+              <div className="px-8 pb-4">
+                <p className="text-xs text-slate-500 font-medium italic">Active mentoring connections</p>
+              </div>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <Card className="border-none bg-gradient-to-br from-[#002147] to-[#0F3057] text-white shadow-xl shadow-[#002147]/20 group overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
+              <CardContent className="p-8 pb-6 flex items-center justify-between relative z-10">
+                <div>
+                  <p className="text-sm font-bold text-white/60 uppercase tracking-widest mb-1">Status</p>
+                  <h3 className="text-2xl font-bold flex items-center gap-2">
+                    {profile?.is_verified ? (
+                      <><CheckCircle className="w-6 h-6 text-green-400" /> Verified</>
+                    ) : (
+                      <><Clock className="w-6 h-6 text-yellow-400" /> Pending</>
+                    )}
+                  </h3>
+                </div>
+                <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center group-hover:bg-white/20 transition-all">
+                  <ShieldCheck className="w-7 h-7" />
+                </div>
+              </CardContent>
+              <div className="px-8 pb-4 relative z-10">
+                <p className="text-xs text-white/50 font-medium uppercase tracking-wider">Verification status on AlumConnect</p>
+              </div>
+            </Card>
+          </motion.div>
+        </section>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          {/* PROFILE PREVIEW */}
+          <div className="lg:col-span-1">
+            <h3 className="text-xl font-serif font-bold text-[#002147] mb-6 flex items-center gap-2">
+              <User className="w-5 h-5" />
+              Professional Identity
+            </h3>
+            <Card className="border-slate-200 bg-white shadow-sm overflow-hidden sticky top-28">
+              <CardContent className="p-8 space-y-8">
+                <div className="flex flex-col items-center text-center">
+                  <Avatar className="w-24 h-24 border-4 border-slate-50 shadow-md mb-2 bg-white ring-2 ring-[#002147]/5">
+                    <AvatarImage src={user?.picture} />
+                    <AvatarFallback className="text-2xl font-bold text-[#002147] bg-[#002147]/5">
+                      {getInitials(user?.name)}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleSyncLinkedIn}
+                    disabled={isSyncing}
+                    className="h-7 px-2 text-[10px] font-bold text-slate-400 hover:text-[#0077B5] hover:bg-[#0077B5]/5 gap-1.5 mb-2 transition-all"
+                  >
+                    <RefreshCw className={`w-3 h-3 ${isSyncing ? "animate-spin text-[#0077B5]" : ""}`} />
+                    {isSyncing ? "Syncing..." : "Sync LinkedIn Photo"}
+                  </Button>
+
+                  <h4 className="text-xl font-bold text-[#002147]">{user?.name}</h4>
+                  <p className="text-slate-500 font-medium text-sm">{profile?.job_title}</p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Badge variant="secondary" className="bg-[#002147]/5 text-[#002147] border-none font-bold text-[10px] py-0.5 px-2">
+                      Class of {profile?.graduation_year}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center shrink-0">
+                      <Briefcase className="w-4 h-4 text-[#002147]" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Impact at</p>
+                      <p className="font-bold text-slate-700 text-sm">{profile?.company}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center shrink-0">
+                      <GraduationCap className="w-4 h-4 text-[#002147]" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Graduated from</p>
+                      <p className="font-bold text-slate-700 text-sm">{profile?.department}</p>
+                    </div>
+                  </div>
+
+                  {profile?.linkedin_url && (
+                    <a
+                      href={profile.linkedin_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center w-full gap-2 py-3 bg-slate-50 hover:bg-[#0077B5]/10 text-slate-600 hover:text-[#0077B5] rounded-xl font-bold text-sm transition-all group"
+                    >
+                      <Linkedin className="w-4 h-4" />
+                      LinkedIn Profile
+                      <ArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </a>
+                  )}
+                </div>
+
+                <Separator className="bg-slate-100" />
+
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-3">Skills & Expertise</p>
+                    <div className="flex flex-wrap gap-2">
+                      {profile?.skills?.length > 0 ? (
+                        profile.skills.map((skill, idx) => (
+                          <Badge key={idx} variant="outline" className="text-[10px] font-bold text-[#002147] border-slate-200 py-0.5 px-2">
+                            {skill}
+                          </Badge>
+                        ))
+                      ) : (
+                        <span className="text-slate-400 text-xs italic">No skills added</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-2">Professional Bio</p>
+                    <p className="text-xs text-slate-600 leading-relaxed italic line-clamp-4">
+                      {profile?.bio || 'Add a bio to tell students how you can help them achieve their career goals.'}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* REQUESTS LIST */}
+          <div className="lg:col-span-2 space-y-8">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <h3 className="text-2xl font-serif font-bold text-[#002147] flex items-center gap-3">
+                <Mail className="w-6 h-6" />
+                Mentorship Inbox
+              </h3>
+              <Badge variant="outline" className="text-slate-400 border-slate-200 font-bold">
+                {requests.length} Overall
+              </Badge>
             </div>
-          )}
+
+            {requests.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-white rounded-3xl p-20 text-center border-2 border-dashed border-slate-100 shadow-sm"
+              >
+                <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Mail className="w-10 h-10 text-slate-300" />
+                </div>
+                <h4 className="text-2xl font-bold text-[#002147] mb-2">Inbox is clean</h4>
+                <p className="text-slate-500 max-w-sm mx-auto font-medium">
+                  When students reach out for mentorship, their requests will appear here. Consider updating your profile to increase visibility.
+                </p>
+              </motion.div>
+            ) : (
+              <div className="space-y-6 pb-12">
+                <AnimatePresence mode="popLayout">
+                  {requests.map((request, idx) => (
+                    <motion.div
+                      key={request.request_id}
+                      layout
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.3, delay: idx * 0.05 }}
+                    >
+                      <MentorshipRequestCard
+                        request={request}
+                        userRole="alumni"
+                        onUpdate={fetchRequests}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </main>
+
+      <footer className="mt-auto border-t border-slate-100 bg-white py-12">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="flex items-center gap-2 opacity-60">
+            <div className="w-6 h-6 bg-[#002147] rounded flex items-center justify-center text-white font-bold text-sm">
+              A
+            </div>
+            <span className="font-serif font-bold text-[#002147]">AlumConnect</span>
+          </div>
+          <p className="text-sm text-slate-400 font-medium">© 2026 AlumConnect Platform. All rights reserved.</p>
+          <div className="flex items-center gap-6">
+            <a href="#" className="text-xs font-bold text-slate-400 hover:text-[#002147] uppercase tracking-widest transition-colors">Privacy</a>
+            <a href="#" className="text-xs font-bold text-slate-400 hover:text-[#002147] uppercase tracking-widest transition-colors">Terms</a>
+            <a href="#" className="text-xs font-bold text-slate-400 hover:text-[#002147] uppercase tracking-widest transition-colors">Support</a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
