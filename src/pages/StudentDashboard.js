@@ -68,6 +68,7 @@ const StudentDashboard = () => {
   const [stats, setStats] = useState({ verified_alumni_count: 0, last_active: null });
   const [leaderboard, setLeaderboard] = useState([]);
   const [tipIndex, setTipIndex] = useState(0);
+  const [proTips, setProTips] = useState(PRO_TIPS);
 
   const fetchData = useCallback(async () => {
     try {
@@ -96,6 +97,18 @@ const StudentDashboard = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setLeaderboard(leaderboardRes.data.slice(0, 3));
+      // 5. Fetch Alumni Wisdom Tips
+      const wisdomRes = await axios.get(`${API_URL}/api/student/wisdom`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (wisdomRes.data && wisdomRes.data.length > 0) {
+        // Map backend response to frontend format
+        const formattedTips = wisdomRes.data.map(t => ({
+          text: t.text,
+          author: `${t.author_name} (Expert Alum)`
+        }));
+        setProTips([...formattedTips, ...PRO_TIPS]);
+      }
 
     } catch (error) {
       console.error(error);
@@ -112,11 +125,12 @@ const StudentDashboard = () => {
 
   // Tip Slider Logic
   useEffect(() => {
+    if (proTips.length <= 1) return;
     const timer = setInterval(() => {
-      setTipIndex((prev) => (prev + 1) % PRO_TIPS.length);
+      setTipIndex((prev) => (prev + 1) % proTips.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, []);
+  }, [proTips.length]);
 
   const handleLogout = async () => {
     try {
@@ -217,14 +231,14 @@ const StudentDashboard = () => {
                     className="min-h-[100px]"
                   >
                     <p className="text-lg font-bold text-[#002147] dark:text-slate-200 leading-tight mb-4 tracking-tight italic">
-                      "{PRO_TIPS[tipIndex].text}"
+                      "{proTips[tipIndex]?.text}"
                     </p>
-                    <p className="text-[10px] font-black uppercase tracking-tighter text-slate-400">— {PRO_TIPS[tipIndex].author}</p>
+                    <p className="text-[10px] font-black uppercase tracking-tighter text-slate-400">— {proTips[tipIndex]?.author}</p>
                   </motion.div>
                 </AnimatePresence>
               </div>
               <div className="flex gap-1.5 mt-4">
-                {PRO_TIPS.map((_, i) => (
+                {proTips.map((_, i) => (
                   <div key={i} className={`h-1 rounded-full transition-all duration-300 ${i === tipIndex ? 'w-6 bg-[#002147] dark:bg-slate-200' : 'w-2 bg-slate-200 dark:bg-slate-800'}`} />
                 ))}
               </div>
