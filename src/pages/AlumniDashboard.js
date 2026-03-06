@@ -35,7 +35,6 @@ import {
   CalendarDays,
   Target,
   Search,
-  Users2,
 } from "lucide-react";
 import {
   Dialog,
@@ -66,8 +65,6 @@ const AlumniDashboard = () => {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [requests, setRequests] = useState([]);
-  const [students, setStudents] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [profileUpdate, setProfileUpdate] = useState({});
@@ -137,14 +134,9 @@ const AlumniDashboard = () => {
         linkedin_url: pData.linkedin_url || "",
       });
 
-      const [requestsResponse, studentsResponse] = await Promise.all([
-        axios.get(`${API_URL}/api/mentorship/requests`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        axios.get(`${API_URL}/api/alumni/students`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-      ]);
+      const requestsResponse = await axios.get(`${API_URL}/api/mentorship/requests`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       // Inject logic for Feature 4: Priority Sorting (Mocked based on description/topic)
       const enrichedRequests = requestsResponse.data.map(req => ({
@@ -153,7 +145,6 @@ const AlumniDashboard = () => {
       }));
 
       setRequests(enrichedRequests);
-      setStudents(studentsResponse.data);
     } catch (error) {
       console.error(error);
       toast.error("Failed to load dashboard data");
@@ -264,10 +255,6 @@ const AlumniDashboard = () => {
     }
   };
 
-  const filteredStudents = students.filter(student => 
-    student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    student.department.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   const getInitials = (name) => {
     if (!name) return "??";
@@ -787,73 +774,6 @@ const AlumniDashboard = () => {
               )}
             </section>
 
-            {/* STUDENT DIRECTORY SECTION */}
-            <section className="space-y-8">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-6 px-2">
-                <div className="space-y-1">
-                  <h3 className="text-3xl font-serif font-black text-[#002147] dark:text-white tracking-tighter flex items-center gap-4">
-                    Student <span className="text-slate-300 dark:text-white/20">Directory</span>
-                  </h3>
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Next Generation Talent</p>
-                </div>
-                
-                <div className="relative group max-w-xs w-full">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#002147] transition-colors" />
-                  <Input 
-                    placeholder="Search by name or department..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-12 rounded-2xl border-slate-100 dark:border-white/5 dark:bg-slate-900 h-11 text-sm font-bold shadow-sm focus:ring-[#002147]"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-12">
-                <AnimatePresence mode="popLayout">
-                  {filteredStudents.map((student, idx) => (
-                    <motion.div
-                      key={student.user_id}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.3, delay: idx * 0.05 }}
-                    >
-                      <Card className="border-none bg-white dark:bg-slate-900 shadow-sm hover:shadow-xl transition-all duration-300 rounded-[2.5rem] group overflow-hidden border border-slate-50 dark:border-white/5">
-                        <CardContent className="p-8 text-center space-y-6">
-                           <div className="relative mx-auto w-20 h-20">
-                              <Avatar className="w-full h-full rounded-[1.5rem] shadow-lg ring-4 ring-slate-50 dark:ring-slate-950">
-                                <AvatarImage src={student.picture} />
-                                <AvatarFallback className="text-xl font-black bg-slate-100 dark:bg-slate-800">
-                                  {getInitials(student.name)}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-xl border-4 border-white dark:border-slate-900 flex items-center justify-center">
-                                 <Plus className="w-3 h-3 text-white" />
-                              </div>
-                           </div>
-                           <div className="space-y-1">
-                              <h4 className="font-bold text-[#002147] dark:text-white truncate">{student.name}</h4>
-                              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 truncate">{student.department}</p>
-                           </div>
-                           <Button 
-                            variant="ghost" 
-                            className="w-full rounded-xl text-[10px] font-black uppercase tracking-widest text-[#002147] dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 border border-slate-100 dark:border-white/10"
-                           >
-                             View Talent
-                           </Button>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-                
-                {filteredStudents.length === 0 && (
-                  <div className="col-span-full py-20 text-center">
-                     <Users2 className="w-12 h-12 text-slate-100 dark:text-slate-800 mx-auto mb-4" />
-                     <p className="text-sm font-bold text-slate-400 italic">No matching students in the directory.</p>
-                  </div>
-                )}
-              </div>
-            </section>
 
             {/* Bomb Extras: Achievement Shelf for Alumni */}
             <section className="pb-12 px-2">
