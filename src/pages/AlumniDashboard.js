@@ -479,139 +479,168 @@ const AlumniDashboard = () => {
         </section>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          {/* PROFILE CARD & SIDEBAR (LEFT) */}
+          {/* EXPERT IDENTITY SIDEBAR (LEFT) */}
           <div className="lg:col-span-4 space-y-8">
-            <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden sticky top-28 transition-colors">
-              <CardContent className="p-8 space-y-8">
-                <div className="flex flex-col items-center text-center">
-                  <div className="relative mb-6">
-                    <Avatar className="w-24 h-24 border-4 border-slate-50 dark:border-slate-800 shadow-md bg-white dark:bg-slate-950 ring-2 ring-[#002147]/5">
-                      <AvatarImage src={user?.picture} />
-                      <AvatarFallback className="text-2xl font-bold text-[#002147] dark:text-slate-200 bg-[#002147]/5 dark:bg-slate-800">
-                        {getInitials(user?.name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    
-                    {profile?.is_verified && (
-                      <div className="absolute -bottom-1 -right-1 bg-white dark:bg-slate-900 p-1 rounded-full shadow-sm ring-2 ring-white dark:ring-slate-900">
-                        <CheckCircle className="w-5 h-5 text-green-500 fill-white dark:fill-slate-900" />
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              className="sticky top-28"
+            >
+              <Card className="border-none bg-white dark:bg-[#001529] shadow-2xl shadow-slate-200 dark:shadow-black/60 overflow-hidden transition-all duration-500 rounded-[3rem] border border-white/5">
+                {/* Profile Header Background Mesh */}
+                <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-br from-[#002147] to-[#0a3d62] opacity-10 dark:opacity-40" />
+                
+                <CardContent className="p-10 relative z-10 pt-16">
+                  {/* Hex/Squircle Avatar System */}
+                  <div className="flex flex-col items-center text-center">
+                    <div className="relative mb-8 group">
+                      <motion.div
+                        animate={{ 
+                          rotate: [0, 5, -5, 0],
+                        }}
+                        transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+                        className="absolute -inset-4 bg-gradient-to-tr from-orange-500 via-blue-500 to-purple-600 rounded-[2.5rem] opacity-20 blur-xl group-hover:opacity-40 transition-opacity duration-500"
+                      />
+                      
+                      <div className="relative w-32 h-32 p-1 bg-gradient-to-br from-white/20 to-transparent rounded-[2.2rem] backdrop-blur-3xl shadow-2xl">
+                        <Avatar className="w-full h-full rounded-[2rem] border-2 border-white/10 shadow-inner overflow-hidden">
+                          <AvatarImage src={user?.picture} className="object-cover" />
+                          <AvatarFallback className="text-3xl font-black text-[#002147] dark:text-white bg-slate-100 dark:bg-slate-800">
+                            {getInitials(user?.name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        
+                        {/* Status Ring */}
+                        <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 border-4 border-white dark:border-[#001529] rounded-2xl shadow-lg shadow-green-500/40 flex items-center justify-center">
+                           <div className="w-2 h-2 bg-white rounded-full animate-ping" />
+                        </div>
                       </div>
-                    )}
-                    
-                    <button
-                      onClick={handleSyncLinkedIn}
-                      disabled={isSyncing}
-                      className="absolute -top-1 -right-1 bg-white dark:bg-slate-800 p-1.5 rounded-full shadow-sm text-slate-400 hover:text-[#0077B5] transition-all hover:scale-110 active:scale-90"
-                      title="Sync LinkedIn Photo"
-                    >
-                      <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin text-[#0077B5]" : ""}`} />
-                    </button>
-                  </div>
 
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="text-xl font-bold text-[#002147] dark:text-white">{user?.name}</h4>
-                    {profile?.linkedin_url && (
-                      <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-[#0077B5] transition-colors">
-                        <Linkedin className="w-4 h-4" />
-                      </a>
-                    )}
-                  </div>
-                  <p className="text-slate-500 dark:text-slate-400 font-medium text-sm mb-4">{profile?.job_title}</p>
-                  
-                  {/* Bomb 3: Open to Refer Toggle */}
-                  <div className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all duration-500 ${isOpenToRefer ? 'bg-green-50/50 dark:bg-green-950/20 border-green-500/30' : 'bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-800'}`}>
-                    <div className="flex items-center gap-3">
-                      <Flame className={`w-5 h-5 ${isOpenToRefer ? 'text-green-500 animate-pulse' : 'text-slate-400'}`} />
-                      <div className="text-left">
-                         <p className={`text-[10px] font-black uppercase tracking-widest ${isOpenToRefer ? 'text-green-600 dark:text-green-400' : 'text-slate-400'}`}>Open to Refer</p>
-                         <p className="text-[9px] font-bold text-slate-400 italic">Visible at {profile?.company}</p>
+                      <button
+                        onClick={handleSyncLinkedIn}
+                        disabled={isSyncing}
+                        className="absolute -top-3 -right-3 bg-white dark:bg-slate-800 p-2.5 rounded-2xl shadow-xl text-slate-400 hover:text-[#0077B5] transition-all hover:scale-110 active:scale-90 border border-slate-100 dark:border-white/5"
+                        title="Sync LinkedIn Photo"
+                      >
+                        <RefreshCw className={`w-4 h-4 ${isSyncing ? "animate-spin text-[#0077B5]" : ""}`} />
+                      </button>
+                    </div>
+
+                    <div className="space-y-1 mb-6">
+                      <div className="flex items-center justify-center gap-2">
+                        <h4 className="text-2xl font-serif font-black text-[#002147] dark:text-white tracking-tighter">
+                          {user?.name}
+                        </h4>
+                        {profile?.is_verified && (
+                          <ShieldCheck className="w-5 h-5 text-blue-500 fill-blue-500/10" />
+                        )}
+                      </div>
+                      <div className="flex items-center justify-center gap-2 text-slate-400 dark:text-slate-500 font-black text-[10px] uppercase tracking-[0.2em]">
+                        <span>{profile?.job_title}</span>
+                        <span className="w-1 h-1 bg-slate-300 rounded-full" />
+                        <span className="text-[#0077B5]">{profile?.company}</span>
                       </div>
                     </div>
-                    <Switch 
-                      checked={isOpenToRefer} 
-                      onCheckedChange={handleToggleRefer} 
-                      className="data-[state=checked]:bg-green-500"
-                    />
-                  </div>
-                </div>
 
-                {/* Feature 2: Availability Heatmap */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CalendarDays className="w-4 h-4 text-[#002147] dark:text-slate-400" />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Expert Availability</p>
-                  </div>
-                  <div className="grid grid-cols-7 gap-1.5">
-                    {days.map((day, idx) => (
-                      <div key={day} className="flex flex-col items-center gap-1.5">
-                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">{day[0]}</span>
-                        <div 
-                          onClick={() => {
-                            const newAvail = [...availability];
-                            newAvail[idx] = !newAvail[idx];
-                            setAvailability(newAvail);
-                            toast.success(`Updated availability for ${day}`);
-                          }}
-                          className={`w-full h-6 rounded-md cursor-pointer transition-all duration-300 hover:scale-110 shadow-sm ${availability[idx] ? 'bg-green-500 shadow-green-500/20' : 'bg-slate-100 dark:bg-slate-800'}`} 
+                    {/* Improvised Open to Refer Toggle */}
+                    <div className={`w-full p-1 rounded-[1.8rem] transition-all duration-500 ${isOpenToRefer ? 'bg-green-500/10' : 'bg-slate-50 dark:bg-white/5'}`}>
+                      <div className="flex items-center justify-between p-4 bg-white dark:bg-slate-900/50 rounded-[1.5rem] shadow-sm border border-slate-100 dark:border-white/5">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-xl transition-colors ${isOpenToRefer ? 'bg-green-500/20 text-green-500' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
+                            <Flame className={`w-4 h-4 ${isOpenToRefer ? 'animate-pulse' : ''}`} />
+                          </div>
+                          <div className="text-left">
+                             <p className={`text-[9px] font-black uppercase tracking-widest ${isOpenToRefer ? 'text-green-600 dark:text-green-400' : 'text-slate-500'}`}>Hiring Referral</p>
+                             <p className="text-[10px] font-bold text-slate-400 tracking-tighter italic">Currently at {profile?.company}</p>
+                          </div>
+                        </div>
+                        <Switch 
+                          checked={isOpenToRefer} 
+                          onCheckedChange={handleToggleRefer} 
+                          className="data-[state=checked]:bg-green-500"
                         />
                       </div>
-                    ))}
-                  </div>
-                  <p className="text-[8px] text-slate-400 italic font-bold text-center mt-1">Tap to toggle your weekly office hours</p>
-                </div>
-
-                <Separator className="bg-slate-100 dark:bg-slate-800" />
-
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                      <Briefcase className="w-4 h-4 text-[#002147] dark:text-slate-400" />
                     </div>
-                    <p className="font-bold text-slate-700 dark:text-slate-200 text-sm py-1 whitespace-nowrap">{profile?.company}</p>
                   </div>
 
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                      <GraduationCap className="w-4 h-4 text-[#002147] dark:text-slate-400" />
+                  {/* Availability Circuit */}
+                  <div className="mt-10 space-y-5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <CalendarDays className="w-4 h-4 text-[#002147] dark:text-blue-400" />
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Weekly Office Hours</p>
+                      </div>
+                      <Badge variant="outline" className="text-[8px] font-black border-slate-200 dark:border-white/10 dark:text-slate-500 uppercase">Live Sync</Badge>
                     </div>
-                    <p className="font-bold text-slate-700 dark:text-slate-200 text-sm py-1 whitespace-nowrap">{profile?.department}</p>
+                    
+                    <div className="grid grid-cols-7 gap-2">
+                      {days.map((day, idx) => (
+                        <div key={day} className="flex flex-col items-center gap-2">
+                          <span className="text-[9px] font-black text-slate-300 dark:text-slate-600 uppercase tracking-tighter">{day[0]}</span>
+                          <motion.div 
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => {
+                              const newAvail = [...availability];
+                              newAvail[idx] = !newAvail[idx];
+                              setAvailability(newAvail);
+                              toast.success(`Schedule updated for ${day}`);
+                            }}
+                            className={`w-full h-8 rounded-xl cursor-pointer transition-all duration-300 shadow-sm border ${availability[idx] ? 'bg-blue-500 border-blue-400 shadow-blue-500/40' : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700'}`} 
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
 
-                <Separator className="bg-slate-100 dark:bg-slate-800" />
+                  <Separator className="my-10 bg-slate-100 dark:bg-white/5" />
 
-                <div className="space-y-4">
-                  <div className="flex flex-wrap gap-2">
-                    {profile?.skills?.length > 0 ? (
-                      profile.skills.map((skill, idx) => (
-                        <Badge key={idx} variant="outline" className="text-[10px] font-bold text-[#002147] dark:text-slate-300 border-slate-200 dark:border-slate-800 py-0.5 px-2 bg-white dark:bg-slate-950 shadow-sm">
-                          {skill}
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Bio & Expertise</p>
+                      <Plus className="w-3 h-3 text-slate-300" />
+                    </div>
+                    
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-bold tracking-tight italic bg-slate-50 dark:bg-white/5 p-4 rounded-2xl border border-slate-100 dark:border-white/5 relative overflow-hidden">
+                       <span className="relative z-10">{profile?.bio || 'Add a bio to help students find the right mentorship.'}</span>
+                    </p>
+
+                    <div className="flex flex-wrap gap-2">
+                      {profile?.skills?.map((skill, idx) => (
+                        <Badge 
+                          key={idx} 
+                          className="bg-slate-100 dark:bg-white/5 hover:bg-slate-200 text-slate-600 dark:text-slate-300 border-none px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest transition-colors"
+                        >
+                          # {skill}
                         </Badge>
-                      ))
-                    ) : (
-                      <span className="text-slate-400 text-xs italic">No skills added</span>
-                    )}
+                      ))}
+                    </div>
                   </div>
+                </CardContent>
+              </Card>
 
-                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed italic line-clamp-4 font-medium tracking-tight">
-                    {profile?.bio || 'Add a bio to help students find the right mentorship.'}
-                  </p>
+              {/* Redesigned Network Pulse Card */}
+              <Card className="mt-8 border-none bg-gradient-to-br from-slate-900 to-black p-8 rounded-[2.5rem] shadow-xl shadow-black/40 overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-colors" />
+                
+                <div className="relative z-10 space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Activity className="w-4 h-4 text-orange-500 animate-pulse" />
+                      <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Campus Pulse</p>
+                    </div>
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+                  </div>
+                  
+                  <div className="space-y-5">
+                    <PulseItem icon={Users} label="Batch '24 Peak" val="+12 New Alums" color="text-blue-400" />
+                    <PulseItem icon={Star} label="Authority" val="Top 5% Mentor" color="text-yellow-400" />
+                    <PulseItem icon={Globe} label="Geo Reach" val="Global Hub" color="text-emerald-400" />
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Feature 3: Network Pulse Card */}
-            <Card className="border-none bg-slate-50 dark:bg-slate-900 p-6 rounded-[1.5rem] transition-colors">
-              <div className="flex items-center gap-2 mb-4">
-                <Activity className="w-3.5 h-3.5 text-orange-500" />
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Network Pulse</p>
-              </div>
-              <div className="space-y-4">
-                <PulseItem icon={Users} label="Batch '20 Active" val="+4 Expert Joins" color="text-blue-500" />
-                <PulseItem icon={Star} label="Rank" val="#2 in CS Dept" color="text-yellow-500" />
-                <PulseItem icon={Globe} label="Geo Reach" val="5 Cities" color="text-green-500" />
-              </div>
-            </Card>
+              </Card>
+            </motion.div>
           </div>
 
           {/* MAIN CONTENT (RIGHT) */}
