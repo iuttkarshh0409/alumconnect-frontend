@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
 import axios from "axios";
@@ -37,6 +38,7 @@ const StudentDashboard = () => {
   const [user, setUser] = useState(null);
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({ verified_alumni_count: 0, last_active: null });
 
   const fetchData = useCallback(async () => {
     try {
@@ -54,8 +56,12 @@ const StudentDashboard = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
       setRequests(requestsRes.data);
+
+      const statsRes = await axios.get(`${API_URL}/api/student/stats`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setStats(statsRes.data);
     } catch (error) {
       console.error(error);
       toast.error("Failed to load user data");
@@ -153,7 +159,7 @@ const StudentDashboard = () => {
                   <span className="w-1.5 h-1.5 rounded-full bg-slate-200"></span>
                   <span className="flex items-center gap-1.5">
                     <Clock className="w-4 h-4" />
-                    Last active: Today
+                    Last active: {stats.last_active ? `${formatDistanceToNow(new Date(stats.last_active))} ago` : 'Just now'}
                   </span>
                 </div>
               </div>
@@ -223,7 +229,7 @@ const StudentDashboard = () => {
               <CardContent className="p-8 pb-6 flex items-center justify-between">
                 <div>
                   <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Network</p>
-                  <h3 className="text-4xl font-extrabold text-[#002147]">50+</h3>
+                  <h3 className="text-4xl font-extrabold text-[#002147]">{stats.verified_alumni_count}</h3>
                 </div>
                 <div className="w-14 h-14 bg-[#002147]/5 rounded-2xl flex items-center justify-center text-[#002147] group-hover:scale-110 transition-transform">
                   <Users className="w-7 h-7" />
