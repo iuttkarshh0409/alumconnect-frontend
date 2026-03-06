@@ -253,9 +253,6 @@ const AlumniDashboard = () => {
           >
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
               <div>
-                <Badge variant="outline" className="mb-4 bg-[#003B5C]/5 text-[#003B5C] border-none px-3 py-1 font-semibold uppercase tracking-widest text-[10px]">
-                  Alumni Portal
-                </Badge>
                 <h2 className="font-serif text-5xl font-extrabold text-[#002147] mb-4 tracking-tight">
                   Hello, {user?.name?.split(" ")[0]}!
                 </h2>
@@ -383,18 +380,15 @@ const AlumniDashboard = () => {
             transition={{ delay: 0.3 }}
           >
             <Card className="border-slate-200 hover:border-green-200 transition-all duration-300 group bg-white shadow-sm hover:shadow-lg">
-              <CardContent className="p-8 pb-6 flex items-center justify-between">
+              <CardContent className="p-8 flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Mentoring</p>
+                  <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Active Sessions</p>
                   <h3 className="text-4xl font-extrabold text-[#002147]">{acceptedRequests}</h3>
                 </div>
                 <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 group-hover:scale-110 transition-transform">
                   <Users className="w-7 h-7" />
                 </div>
               </CardContent>
-              <div className="px-8 pb-4">
-                <p className="text-xs text-slate-500 font-medium italic">Active mentoring connections</p>
-              </div>
             </Card>
           </motion.div>
 
@@ -430,7 +424,14 @@ const AlumniDashboard = () => {
                     </button>
                   </div>
 
-                  <h4 className="text-xl font-bold text-[#002147]">{user?.name}</h4>
+                  <div className="flex items-center gap-2">
+                    <h4 className="text-xl font-bold text-[#002147]">{user?.name}</h4>
+                    {profile?.linkedin_url && (
+                      <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-[#0077B5] transition-colors">
+                        <Linkedin className="w-4 h-4" />
+                      </a>
+                    )}
+                  </div>
                   <p className="text-slate-500 font-medium text-sm">{profile?.job_title}</p>
                   <div className="flex items-center gap-2 mt-2">
                     <Badge variant="secondary" className="bg-[#002147]/5 text-[#002147] border-none font-bold text-[10px] py-0.5 px-2">
@@ -458,25 +459,12 @@ const AlumniDashboard = () => {
                     </div>
                   </div>
 
-                  {profile?.linkedin_url && (
-                    <a
-                      href={profile.linkedin_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center w-full gap-2 py-3 bg-slate-50 hover:bg-[#0077B5]/10 text-slate-600 hover:text-[#0077B5] rounded-xl font-bold text-sm transition-all group"
-                    >
-                      <Linkedin className="w-4 h-4" />
-                      LinkedIn Profile
-                      <ArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </a>
-                  )}
                 </div>
 
                 <Separator className="bg-slate-100" />
 
                 <div className="space-y-4">
                   <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-3">Skills & Expertise</p>
                     <div className="flex flex-wrap gap-2">
                       {profile?.skills?.length > 0 ? (
                         profile.skills.map((skill, idx) => (
@@ -491,7 +479,6 @@ const AlumniDashboard = () => {
                   </div>
 
                   <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-2">Professional Bio</p>
                     <p className="text-xs text-slate-600 leading-relaxed italic line-clamp-4">
                       {profile?.bio || 'Add a bio to tell students how you can help them achieve their career goals.'}
                     </p>
@@ -550,19 +537,12 @@ const AlumniDashboard = () => {
         </div>
       </main>
 
-      <footer className="mt-auto border-t border-slate-100 bg-white py-12">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center gap-2 opacity-60">
-            <div className="w-6 h-6 bg-[#002147] rounded flex items-center justify-center text-white font-bold text-sm">
-              A
-            </div>
-            <span className="font-serif font-bold text-[#002147]">AlumConnect</span>
-          </div>
-          <p className="text-sm text-slate-400 font-medium">© 2026 AlumConnect Platform. All rights reserved.</p>
-          <div className="flex items-center gap-6">
-            <a href="#" className="text-xs font-bold text-slate-400 hover:text-[#002147] uppercase tracking-widest transition-colors">Privacy</a>
-            <a href="#" className="text-xs font-bold text-slate-400 hover:text-[#002147] uppercase tracking-widest transition-colors">Terms</a>
-            <a href="#" className="text-xs font-bold text-slate-400 hover:text-[#002147] uppercase tracking-widest transition-colors">Support</a>
+      <footer className="mt-auto py-8">
+        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center text-[10px] font-bold text-slate-300 uppercase tracking-[0.2em]">
+          <p>© 2026 AlumConnect Expert Network</p>
+          <div className="flex gap-6">
+            <a href="#" className="hover:text-[#002147] transition-colors">Privacy</a>
+            <a href="#" className="hover:text-[#002147] transition-colors">Support</a>
           </div>
         </div>
       </footer>
