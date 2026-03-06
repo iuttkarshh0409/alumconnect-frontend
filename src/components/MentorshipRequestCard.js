@@ -35,13 +35,13 @@ const MentorshipRequestCard = ({ request, userRole, onUpdate }) => {
   const getStatusIcon = () => {
     switch (request.status) {
       case "pending":
-        return <Clock className="w-5 h-5 text-yellow-600" />;
+        return <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-500" />;
       case "accepted":
-        return <CheckCircle className="w-5 h-5 text-green-600" />;
+        return <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-500" />;
       case "rejected":
-        return <XCircle className="w-5 h-5 text-red-600" />;
+        return <XCircle className="w-5 h-5 text-red-600 dark:text-red-500" />;
       case "expired":
-        return <AlertCircle className="w-5 h-5 text-gray-600" />;
+        return <AlertCircle className="w-5 h-5 text-gray-600 dark:text-gray-500" />;
       default:
         return null;
     }
@@ -85,46 +85,46 @@ const MentorshipRequestCard = ({ request, userRole, onUpdate }) => {
   return (
     <div
       data-testid={`mentorship-request-card-${request.request_id}`}
-      className={`bg-white rounded-lg border-l-4 ${getStatusColor()} shadow-sm p-6 hover:shadow-md transition-shadow`}
+      className={`bg-white dark:bg-slate-900 rounded-lg border-l-4 ${getStatusColor()} shadow-sm p-6 hover:shadow-md transition-shadow dark:border-opacity-80 transition-colors duration-300`}
     >
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
             {getStatusIcon()}
-            <span className="font-semibold text-[#002147] capitalize">
+            <span className="font-semibold text-[#002147] dark:text-slate-200 capitalize">
               {request.status}
             </span>
           </div>
-          <h4 className="text-lg font-semibold text-[#002147] mb-1">
+          <h4 className="text-lg font-semibold text-[#002147] dark:text-white mb-1">
             {request.topic}
           </h4>
           {displayUser && (
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-slate-600 dark:text-slate-400 font-medium tracking-tight">
               {userRole === "student" ? "Mentor" : "Student"}:{" "}
               {displayUser.name}
             </p>
           )}
         </div>
-        <div className="flex flex-col items-end gap-2 text-sm text-slate-500">
+        <div className="flex flex-col items-end gap-2 text-sm text-slate-500 dark:text-slate-500">
           <div className="flex items-center gap-4">
             {userRole === "student" && request.status === "pending" && (
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 px-3 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg flex items-center gap-2 font-bold text-[10px] transition-all active:scale-95 border border-red-100/30 hover:border-red-100"
+                className="h-8 px-3 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg flex items-center gap-2 font-bold text-[10px] transition-all active:scale-95 border border-red-100/30 dark:border-red-900/30 hover:border-red-100 dark:hover:border-red-900"
                 onClick={handleWithdraw}
               >
                 <Trash2 className="w-3 h-3" />
                 Withdraw Request
               </Button>
             )}
-            <p className="flex items-center gap-1.5 text-slate-400 font-medium">
+            <p className="flex items-center gap-1.5 text-slate-400 dark:text-slate-600 font-medium">
               <Calendar className="w-3.5 h-3.5" />
               {format(new Date(request.created_at), "MMM dd, yyyy")}
             </p>
           </div>
           {request.status === "pending" && (
-            <p className="text-xs text-yellow-600 font-medium flex items-center gap-1">
+            <p className="text-xs text-yellow-600 dark:text-yellow-500/80 font-medium flex items-center gap-1">
               <Clock className="w-3 h-3" />
               Expires: {format(new Date(request.expires_at), "MMM dd")}
             </p>
@@ -132,7 +132,7 @@ const MentorshipRequestCard = ({ request, userRole, onUpdate }) => {
         </div>
       </div>
 
-      <p className="text-slate-700 mb-4">{request.description}</p>
+      <p className="text-slate-700 dark:text-slate-300 mb-4 tracking-tight leading-relaxed">{request.description}</p>
 
       {userRole === "alumni" && request.status === "pending" && (
         <div className="flex gap-2">
@@ -148,7 +148,7 @@ const MentorshipRequestCard = ({ request, userRole, onUpdate }) => {
             data-testid={`reject-request-btn-${request.request_id}`}
             onClick={() => handleUpdateStatus("rejected")}
             variant="outline"
-            className="border-red-600 text-red-600 hover:bg-red-50 rounded-full flex-1"
+            className="border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-full flex-1"
           >
             <XCircle className="w-4 h-4 mr-2" />
             Reject
@@ -157,11 +157,11 @@ const MentorshipRequestCard = ({ request, userRole, onUpdate }) => {
       )}
 
       {request.status === "accepted" && displayUser && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-4">
-          <p className="text-sm text-green-800 mb-1 font-medium">
+        <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900/30 rounded-lg p-3 mt-4 transition-colors">
+          <p className="text-sm text-green-800 dark:text-green-400 mb-1 font-bold tracking-tight uppercase text-[10px]">
             Contact Information
           </p>
-          <p className="text-sm text-green-700">{displayUser.email}</p>
+          <p className="text-sm text-green-700 dark:text-green-300 font-medium">{displayUser.email}</p>
         </div>
       )}
     </div>

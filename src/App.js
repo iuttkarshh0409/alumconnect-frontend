@@ -108,16 +108,20 @@ function AppRouter() {
 }
 
 
+import { ThemeProvider } from './components/theme-provider';
+
 function App() {
   return (
-    <ClerkProvider publishableKey={process.env.REACT_APP_CLERK_PUBLISHABLE_KEY}>
+    <ThemeProvider defaultTheme="light" storageKey="alumconnect-theme">
+      <ClerkProvider publishableKey={process.env.REACT_APP_CLERK_PUBLISHABLE_KEY}>
       <div className="App">
         <BrowserRouter>
           <AppRouter />
           <Toaster position="top-right" />
         </BrowserRouter>
       </div>
-    </ClerkProvider>
+      </ClerkProvider>
+    </ThemeProvider>
   );
 }
 
