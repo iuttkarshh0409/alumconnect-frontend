@@ -32,6 +32,10 @@ import {
   TrendingUp,
   Star,
   Award,
+  Activity,
+  CalendarDays,
+  Target,
+  Search,
 } from "lucide-react";
 import {
   Dialog,
@@ -74,6 +78,10 @@ const AlumniDashboard = () => {
   const [isOpenToRefer, setIsOpenToRefer] = useState(false);
   const [wisdomText, setWisdomText] = useState("");
   const [isPostingWisdom, setIsPostingWisdom] = useState(false);
+  
+  // Availability Heatmap State (Mocked)
+  const [availability, setAvailability] = useState([true, true, false, true, false, true, true]); // 7 days (S, M, T, W, T, F, S)
+  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   const handleSyncLinkedIn = async () => {
     setIsSyncing(true);
@@ -137,7 +145,13 @@ const AlumniDashboard = () => {
         }
       );
 
-      setRequests(requestsResponse.data);
+      // Inject logic for Feature 4: Priority Sorting (Mocked based on description/topic)
+      const enrichedRequests = requestsResponse.data.map(req => ({
+        ...req,
+        isPriority: req.topic.toLowerCase().includes('interview') || req.description.toLowerCase().includes('faang') || req.description.length > 100
+      }));
+
+      setRequests(enrichedRequests);
     } catch (error) {
       console.error(error);
       toast.error("Failed to load profile data");
@@ -161,7 +175,11 @@ const AlumniDashboard = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      setRequests(response.data);
+      const enrichedRequests = response.data.map(req => ({
+        ...req,
+        isPriority: req.topic.toLowerCase().includes('interview') || req.description.toLowerCase().includes('faang') || req.description.length > 100
+      }));
+      setRequests(enrichedRequests);
     } catch {
       toast.error("Failed to load requests");
     }
@@ -398,7 +416,7 @@ const AlumniDashboard = () => {
 
           {/* Bomb 2: Influence Meter */}
           <div className="md:col-span-4 h-full">
-             <Card className="h-full border-none bg-gradient-to-br from-[#002147] to-[#0F3057] dark:from-slate-900 dark:to-slate-950 text-white shadow-xl shadow-[#002147]/20 dark:shadow-black/50 p-8 rounded-[2rem] relative overflow-hidden group">
+             <Card className="h-full border-none bg-gradient-to-br from-[#002147] to-[#0F3057] dark:from-slate-900 dark:to-slate-950 text-white shadow-xl shadow-[#002147]/20 dark:shadow-black/50 p-8 rounded-[2rem] relative overflow-hidden group transition-all duration-300">
                <TrendingUp className="absolute -top-4 -right-4 w-24 h-24 text-white/5 rotate-12 group-hover:scale-125 transition-transform duration-700" />
                <div className="relative z-10 flex flex-col justify-between h-full">
                   <div>
@@ -485,6 +503,33 @@ const AlumniDashboard = () => {
                   </div>
                 </div>
 
+                {/* Feature 2: Availability Heatmap */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CalendarDays className="w-4 h-4 text-[#002147] dark:text-slate-400" />
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Expert Availability</p>
+                  </div>
+                  <div className="grid grid-cols-7 gap-1.5">
+                    {days.map((day, idx) => (
+                      <div key={day} className="flex flex-col items-center gap-1.5">
+                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">{day[0]}</span>
+                        <div 
+                          onClick={() => {
+                            const newAvail = [...availability];
+                            newAvail[idx] = !newAvail[idx];
+                            setAvailability(newAvail);
+                            toast.success(`Updated availability for ${day}`);
+                          }}
+                          className={`w-full h-6 rounded-md cursor-pointer transition-all duration-300 hover:scale-110 shadow-sm ${availability[idx] ? 'bg-green-500 shadow-green-500/20' : 'bg-slate-100 dark:bg-slate-800'}`} 
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[8px] text-slate-400 italic font-bold text-center mt-1">Tap to toggle your weekly office hours</p>
+                </div>
+
+                <Separator className="bg-slate-100 dark:bg-slate-800" />
+
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center shrink-0">
@@ -521,6 +566,19 @@ const AlumniDashboard = () => {
                   </p>
                 </div>
               </CardContent>
+            </Card>
+
+            {/* Feature 3: Network Pulse Card */}
+            <Card className="border-none bg-slate-50 dark:bg-slate-900 p-6 rounded-[1.5rem] transition-colors">
+              <div className="flex items-center gap-2 mb-4">
+                <Activity className="w-3.5 h-3.5 text-orange-500" />
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Network Pulse</p>
+              </div>
+              <div className="space-y-4">
+                <PulseItem icon={Users} label="Batch '20 Active" val="+4 Expert Joins" color="text-blue-500" />
+                <PulseItem icon={Star} label="Rank" val="#2 in CS Dept" color="text-yellow-500" />
+                <PulseItem icon={Globe} label="Geo Reach" val="5 Cities" color="text-green-500" />
+              </div>
             </Card>
           </div>
 
@@ -562,6 +620,12 @@ const AlumniDashboard = () => {
                   <Mail className="w-6 h-6 opacity-40" />
                   Mentorship Inbox
                 </h3>
+                
+                {/* Feature 4: Priority Toggle/Badge UI Hint */}
+                <div className="flex items-center gap-2">
+                   <Target className="w-3.5 h-3.5 text-red-500" />
+                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">High Impact Focus ON</p>
+                </div>
               </div>
 
               {requests.length === 0 ? (
@@ -581,7 +645,8 @@ const AlumniDashboard = () => {
               ) : (
                 <div className="space-y-6 pb-12">
                   <AnimatePresence mode="popLayout">
-                    {requests.map((request, idx) => (
+                    {/* Feature 4: Sort Priority First */}
+                    {[...requests].sort((a, b) => (b.isPriority === a.isPriority ? 0 : b.isPriority ? 1 : -1)).map((request, idx) => (
                       <motion.div
                         key={request.request_id}
                         layout
@@ -589,7 +654,13 @@ const AlumniDashboard = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, x: -20 }}
                         transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="relative"
                       >
+                        {request.isPriority && request.status === "pending" && (
+                           <Badge className="absolute -top-2 -right-2 z-10 bg-red-500 text-white border-none text-[8px] font-black shadow-lg shadow-red-500/20 px-2 py-1 uppercase tracking-widest ring-4 ring-white dark:ring-slate-950">
+                             Priority Reach
+                           </Badge>
+                        )}
                         <MentorshipRequestCard
                           request={request}
                           userRole="alumni"
@@ -646,6 +717,18 @@ const StatMiniCard = ({ title, val, icon: Icon, color }) => (
   </Card>
 );
 
+const PulseItem = ({ icon: Icon, label, val, color }) => (
+  <div className="flex items-center justify-between">
+    <div className="flex items-center gap-2">
+      <div className={`p-1.5 rounded-lg bg-white dark:bg-slate-800 shadow-sm ${color}`}>
+        <Icon className="w-3.5 h-3.5" />
+      </div>
+      <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400">{label}</span>
+    </div>
+    <span className="text-[10px] font-black text-[#002147] dark:text-white uppercase tracking-tighter">{val}</span>
+  </div>
+);
+
 const ExpertBadge = ({ label, unlocked, icon: Icon, desc }) => (
   <div className={`flex items-center gap-3 px-6 py-4 rounded-2xl border transition-all duration-500 ${unlocked ? 'bg-white dark:bg-slate-900 border-orange-500/30 dark:border-orange-500/20 shadow-lg' : 'bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 opacity-40 grayscale'}`}>
     <div className={`p-2 rounded-xl ${unlocked ? 'bg-orange-500/10 text-orange-500' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
@@ -656,6 +739,25 @@ const ExpertBadge = ({ label, unlocked, icon: Icon, desc }) => (
       <p className="text-[9px] font-bold text-slate-400 italic">{desc}</p>
     </div>
   </div>
+);
+
+const Globe = ({ className }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width="24" 
+    height="24" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <circle cx="12" cy="12" r="10" />
+    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+    <path d="M2 12h20" />
+  </svg>
 );
 
 export default AlumniDashboard;
