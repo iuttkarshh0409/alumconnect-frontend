@@ -6,6 +6,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useTheme } from "@/components/theme-provider";
 import {
   Users,
   TrendingUp,
@@ -21,6 +22,11 @@ import {
   FileText,
   Lightbulb,
   Zap,
+  Target,
+  ShieldCheck,
+  Award,
+  Quote,
+  Flame,
 } from "lucide-react";
 import {
   Card,
@@ -32,8 +38,28 @@ import MentorshipRequestCard from "@/components/MentorshipRequestCard";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
+const PRO_TIPS = [
+  {
+    text: "Focus on DSA, but don't ignore system design for top-tier roles.",
+    author: "Sameer (SDE II @ Amazon)",
+  },
+  {
+    text: "Building projects is better than just watching tutorials. Ship it!",
+    author: "Neha (Fullstack @ Zomato)",
+  },
+  {
+    text: "Networking is not just asking for jobs; it's asking for advice.",
+    author: "Rahul (PM @ Razorpay)",
+  },
+  {
+    text: "Master one language deeply rather than five at a surface level.",
+    author: "Ankit (Sr. Engineer @ Microsoft)",
+  },
+];
+
 const StudentDashboard = () => {
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const { getToken, isLoaded, isSignedIn, signOut } = useAuth();
 
   const [user, setUser] = useState(null);
@@ -41,6 +67,7 @@ const StudentDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ verified_alumni_count: 0, last_active: null });
   const [leaderboard, setLeaderboard] = useState([]);
+  const [tipIndex, setTipIndex] = useState(0);
 
   const fetchData = useCallback(async () => {
     try {
@@ -83,6 +110,14 @@ const StudentDashboard = () => {
     fetchData();
   }, [isLoaded, isSignedIn, fetchData]);
 
+  // Tip Slider Logic
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTipIndex((prev) => (prev + 1) % PRO_TIPS.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
   const handleLogout = async () => {
     try {
       await signOut();
@@ -107,6 +142,14 @@ const StudentDashboard = () => {
   // Mission Tracker Logic
   const MENTOR_GOAL = 5;
   const progressPercent = Math.min((acceptedCount / MENTOR_GOAL) * 100, 100);
+
+  // Achievement Logic
+  const achievements = [
+    { id: "ninja", label: "Outreach Ninja", icon: Target, unlocked: requests.length >= 5, desc: "Sent 5+ Requests" },
+    { id: "connector", label: "Master Connector", icon: Award, unlocked: acceptedCount >= 3, desc: "3+ Sessions Locked" },
+    { id: "pioneer", label: "Early Pioneer", icon: Zap, unlocked: requests.length >= 1, desc: "First Outreach Sent" },
+    { id: "dark", label: "Dark Knight", icon: ShieldCheck, unlocked: theme === "dark", desc: "Using Dark Mode" },
+  ];
 
   return (
     <div className="min-h-screen bg-[#FDFDFB] dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-20 transition-colors duration-300">
@@ -135,10 +178,10 @@ const StudentDashboard = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 pt-12">
-        {/* 🌟 ACTION HUB: WELCOME & GOAL TRACKER */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16 items-start">
-          <div className="lg:col-span-2">
-            <Badge className="mb-4 bg-[#002147]/5 dark:bg-slate-100/5 text-[#002147] dark:text-slate-200 border-none px-4 py-1.5 font-black uppercase tracking-[0.2em] text-[10px]">
+        {/* 🌟 ACTION HUB: WELCOME, FLASHCARDS & GOAL TRACKER */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 items-stretch">
+          <div className="lg:col-span-5 flex flex-col justify-center">
+            <Badge className="mb-4 bg-[#002147]/5 dark:bg-slate-100/5 text-[#002147] dark:text-slate-200 border-none px-4 py-1.5 font-black uppercase tracking-[0.2em] text-[10px] w-fit">
               Active Student Session
             </Badge>
             <h2 className="font-serif text-5xl sm:text-6xl font-black text-[#002147] dark:text-white mb-6 tracking-tighter leading-[0.9]">
@@ -156,13 +199,45 @@ const StudentDashboard = () => {
             </div>
           </div>
 
-          {/* Goal Streak Widget */}
-          <Card className="bg-[#002147] dark:bg-slate-900 text-white border-none shadow-2xl shadow-[#002147]/30 dark:shadow-black/50 p-8 rounded-[2rem] relative overflow-hidden group">
+          {/* Alumni Tips Flashcard (Center) */}
+          <div className="lg:col-span-4 h-full">
+            <div className="h-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] p-8 flex flex-col justify-between relative overflow-hidden group">
+              <Quote className="absolute -top-2 -left-2 w-20 h-20 text-slate-200/40 dark:text-slate-800/20" />
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-4">
+                  <Flame className="w-4 h-4 text-orange-500" />
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Alumni Pro-Tip</p>
+                </div>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={tipIndex}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="min-h-[100px]"
+                  >
+                    <p className="text-lg font-bold text-[#002147] dark:text-slate-200 leading-tight mb-4 tracking-tight italic">
+                      "{PRO_TIPS[tipIndex].text}"
+                    </p>
+                    <p className="text-[10px] font-black uppercase tracking-tighter text-slate-400">— {PRO_TIPS[tipIndex].author}</p>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+              <div className="flex gap-1.5 mt-4">
+                {PRO_TIPS.map((_, i) => (
+                  <div key={i} className={`h-1 rounded-full transition-all duration-300 ${i === tipIndex ? 'w-6 bg-[#002147] dark:bg-slate-200' : 'w-2 bg-slate-200 dark:bg-slate-800'}`} />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Goal Streak Widget (Right) */}
+          <Card className="lg:col-span-3 bg-[#002147] dark:bg-[#001529] text-white border-none shadow-2xl shadow-[#002147]/30 dark:shadow-black/50 p-8 rounded-[2rem] relative overflow-hidden group">
             <Sparkles className="absolute -top-4 -right-4 w-24 h-24 text-white/5 rotate-12 group-hover:scale-125 transition-transform duration-700" />
             <div className="relative z-10">
               <div className="flex justify-between items-center mb-6">
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50">Mission Tracker</p>
-                <Badge className="bg-white/10 text-white border-none text-[10px]">{acceptedCount}/{MENTOR_GOAL} Chat Goal</Badge>
+                <Badge className="bg-white/10 text-white border-none text-[10px]">{acceptedCount}/{MENTOR_GOAL} Goal</Badge>
               </div>
               <h3 className="text-2xl font-serif font-black mb-2">Connect Streak</h3>
               <div className="w-full h-3 bg-white/10 rounded-full mb-4 overflow-hidden">
@@ -179,6 +254,35 @@ const StudentDashboard = () => {
           </Card>
         </section>
 
+        {/* 🏆 TROPHY ROOM BAND */}
+        <section className="mb-12">
+           <div className="flex items-center gap-3 mb-6">
+              <Trophy className="w-5 h-5 text-yellow-500" />
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Achievement Shelf</h3>
+           </div>
+           <div className="flex flex-wrap gap-4">
+              {achievements.map((item) => (
+                <div 
+                  key={item.id} 
+                  className={`flex items-center gap-3 px-6 py-4 rounded-2xl border transition-all duration-500 ${item.unlocked 
+                    ? 'bg-white dark:bg-slate-900 border-yellow-500/30 dark:border-yellow-500/20 shadow-lg shadow-yellow-500/5' 
+                    : 'bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 opacity-40 grayscale'}`}
+                >
+                  <div className={`p-2 rounded-xl ${item.unlocked ? 'bg-yellow-500/10 text-yellow-500' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
+                    <item.icon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className={`text-[10px] font-black uppercase tracking-widest ${item.unlocked ? 'text-[#002147] dark:text-slate-200' : 'text-slate-400'}`}>
+                      {item.label}
+                    </p>
+                    <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 italic">{item.desc}</p>
+                  </div>
+                  {item.unlocked && <Sparkles className="w-3 h-3 text-yellow-500 animate-pulse" />}
+                </div>
+              ))}
+           </div>
+        </section>
+
         {/* 📊 PULSE & STATS ROW */}
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
           <StatMiniCard title="Active" val={pendingCount} tint="bg-yellow-500" icon={Clock} />
@@ -188,7 +292,7 @@ const StudentDashboard = () => {
           {/* Department Leaderboard Card */}
           <div className="bg-slate-50 dark:bg-slate-900 rounded-3xl p-6 border border-slate-100 dark:border-slate-800 transition-colors">
             <div className="flex items-center gap-2 mb-4">
-              <Trophy className="w-4 h-4 text-[#002147] dark:text-slate-400" />
+              <Zap className="w-4 h-4 text-orange-500" />
               <p className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Campus Pulse</p>
             </div>
             <div className="space-y-3">
