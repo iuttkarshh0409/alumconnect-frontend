@@ -116,18 +116,6 @@ const StudentDashboard = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-3 mr-4">
-              <div className="text-right">
-                <p className="text-sm font-bold text-[#002147] leading-none mb-1">{user?.name}</p>
-                <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">{user?.institute_id}</p>
-              </div>
-              <Avatar className="w-9 h-9 border border-slate-200 shadow-sm">
-                <AvatarImage src={user?.picture} />
-                <AvatarFallback className="bg-slate-50 text-[#002147] text-xs font-bold">
-                  {getInitials(user?.name)}
-                </AvatarFallback>
-              </Avatar>
-            </div>
             <Button
               variant="ghost"
               size="sm"
