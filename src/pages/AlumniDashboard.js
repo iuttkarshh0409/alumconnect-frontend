@@ -218,12 +218,21 @@ const AlumniDashboard = () => {
   const postWisdom = async () => {
     if (!wisdomText.trim()) return;
     setIsPostingWisdom(true);
-    // Mimicking a backend post for now - would normally hit an endpoint
-    setTimeout(() => {
-      setIsPostingWisdom(false);
+    try {
+      const token = await getToken();
+      await axios.post(
+        `${API_URL}/api/alumni/wisdom`,
+        { wisdom: wisdomText },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success("Wisdom saved as file! Admins will review it soon.");
       setWisdomText("");
-      toast.success("Wisdom posted! Your tip is now live on Student Dashboards.");
-    }, 1500);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to save wisdom");
+    } finally {
+      setIsPostingWisdom(false);
+    }
   };
 
   const handleLogout = async () => {
