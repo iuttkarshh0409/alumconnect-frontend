@@ -398,62 +398,37 @@ const AlumniDashboard = () => {
             </Card>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <Card className="border-none bg-gradient-to-br from-[#002147] to-[#0F3057] text-white shadow-xl shadow-[#002147]/20 group overflow-hidden relative">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
-              <CardContent className="p-8 pb-6 flex items-center justify-between relative z-10">
-                <div>
-                  <p className="text-sm font-bold text-white/60 uppercase tracking-widest mb-1">Status</p>
-                  <h3 className="text-2xl font-bold flex items-center gap-2">
-                    {profile?.is_verified ? (
-                      <><CheckCircle className="w-6 h-6 text-green-400" /> Verified</>
-                    ) : (
-                      <><Clock className="w-6 h-6 text-yellow-400" /> Pending</>
-                    )}
-                  </h3>
-                </div>
-                <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center group-hover:bg-white/20 transition-all">
-                  <ShieldCheck className="w-7 h-7" />
-                </div>
-              </CardContent>
-              <div className="px-8 pb-4 relative z-10">
-                <p className="text-xs text-white/50 font-medium uppercase tracking-wider">Verification status on AlumConnect</p>
-              </div>
-            </Card>
-          </motion.div>
         </section>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* PROFILE PREVIEW */}
           <div className="lg:col-span-1">
-            <h3 className="text-xl font-serif font-bold text-[#002147] mb-6 flex items-center gap-2">
-              <User className="w-5 h-5" />
-              Professional Identity
-            </h3>
             <Card className="border-slate-200 bg-white shadow-sm overflow-hidden sticky top-28">
               <CardContent className="p-8 space-y-8">
                 <div className="flex flex-col items-center text-center">
-                  <Avatar className="w-24 h-24 border-4 border-slate-50 shadow-md mb-2 bg-white ring-2 ring-[#002147]/5">
-                    <AvatarImage src={user?.picture} />
-                    <AvatarFallback className="text-2xl font-bold text-[#002147] bg-[#002147]/5">
-                      {getInitials(user?.name)}
-                    </AvatarFallback>
-                  </Avatar>
-
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleSyncLinkedIn}
-                    disabled={isSyncing}
-                    className="h-7 px-2 text-[10px] font-bold text-slate-400 hover:text-[#0077B5] hover:bg-[#0077B5]/5 gap-1.5 mb-2 transition-all"
-                  >
-                    <RefreshCw className={`w-3 h-3 ${isSyncing ? "animate-spin text-[#0077B5]" : ""}`} />
-                    {isSyncing ? "Syncing..." : "Sync LinkedIn Photo"}
-                  </Button>
+                  <div className="relative mb-6">
+                    <Avatar className="w-24 h-24 border-4 border-slate-50 shadow-md bg-white ring-2 ring-[#002147]/5">
+                      <AvatarImage src={user?.picture} />
+                      <AvatarFallback className="text-2xl font-bold text-[#002147] bg-[#002147]/5">
+                        {getInitials(user?.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    
+                    {profile?.is_verified && (
+                      <div className="absolute -bottom-1 -right-1 bg-white p-1 rounded-full shadow-sm">
+                        <CheckCircle className="w-5 h-5 text-green-500 fill-white" />
+                      </div>
+                    )}
+                    
+                    <button
+                      onClick={handleSyncLinkedIn}
+                      disabled={isSyncing}
+                      className="absolute -top-1 -right-1 bg-white p-1.5 rounded-full shadow-sm text-slate-400 hover:text-[#0077B5] transition-all hover:scale-110 active:scale-90"
+                      title="Sync LinkedIn Photo"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin text-[#0077B5]" : ""}`} />
+                    </button>
+                  </div>
 
                   <h4 className="text-xl font-bold text-[#002147]">{user?.name}</h4>
                   <p className="text-slate-500 font-medium text-sm">{profile?.job_title}</p>
@@ -470,8 +445,7 @@ const AlumniDashboard = () => {
                       <Briefcase className="w-4 h-4 text-[#002147]" />
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Impact at</p>
-                      <p className="font-bold text-slate-700 text-sm">{profile?.company}</p>
+                      <p className="font-bold text-slate-700 text-sm whitespace-nowrap">{profile?.company}</p>
                     </div>
                   </div>
 
@@ -480,8 +454,7 @@ const AlumniDashboard = () => {
                       <GraduationCap className="w-4 h-4 text-[#002147]" />
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Graduated from</p>
-                      <p className="font-bold text-slate-700 text-sm">{profile?.department}</p>
+                      <p className="font-bold text-slate-700 text-sm whitespace-nowrap">{profile?.department}</p>
                     </div>
                   </div>
 
@@ -535,9 +508,6 @@ const AlumniDashboard = () => {
                 <Mail className="w-6 h-6" />
                 Mentorship Inbox
               </h3>
-              <Badge variant="outline" className="text-slate-400 border-slate-200 font-bold">
-                {requests.length} Overall
-              </Badge>
             </div>
 
             {requests.length === 0 ? (
