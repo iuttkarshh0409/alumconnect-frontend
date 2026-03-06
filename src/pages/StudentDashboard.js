@@ -110,11 +110,11 @@ const StudentDashboard = () => {
       {/* 🚀 HEADER */}
       <header className="sticky top-0 z-50 w-full border-b border-slate-100 bg-white/90 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#002147] rounded-xl flex items-center justify-center shadow-lg shadow-[#002147]/20">
-              <Zap className="w-6 h-6 text-white fill-current" />
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-[#002147] rounded-lg flex items-center justify-center text-white font-bold text-xl">
+              A
             </div>
-            <h1 className="font-serif text-2xl font-black text-[#002147] tracking-tighter italic">
+            <h1 className="font-serif text-2xl font-bold text-[#002147] tracking-tight">
               AlumConnect
             </h1>
           </div>
@@ -183,7 +183,7 @@ const StudentDashboard = () => {
           <div className="bg-slate-50 rounded-3xl p-6 border border-slate-100">
             <div className="flex items-center gap-2 mb-4">
               <Trophy className="w-4 h-4 text-[#002147]" />
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Campus Pulse</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-600">Campus Pulse</p>
             </div>
             <div className="space-y-3">
               {leaderboard.map((item, idx) => (
@@ -286,7 +286,7 @@ const StatMiniCard = ({ title, val, tint, icon: Icon }) => (
       <div className={`p-2 rounded-xl bg-slate-50 ${tint.replace('bg-', 'text-')}`}>
         <Icon className="w-5 h-5" />
       </div>
-      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">{title}</p>
+      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">{title}</p>
     </div>
     <p className="text-3xl font-black text-[#002147] tracking-tighter">{val}</p>
   </div>
