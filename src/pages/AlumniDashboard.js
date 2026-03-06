@@ -230,18 +230,6 @@ const AlumniDashboard = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-3 mr-4">
-              <div className="text-right">
-                <p className="text-sm font-bold text-[#002147] leading-none mb-1">{user?.name}</p>
-                <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Verified Alumni</p>
-              </div>
-              <Avatar className="w-9 h-9 border border-slate-200 shadow-sm">
-                <AvatarImage src={user?.picture} />
-                <AvatarFallback className="bg-slate-50 text-[#002147] text-xs font-bold">
-                  {getInitials(user?.name)}
-                </AvatarFallback>
-              </Avatar>
-            </div>
             <Button
               variant="ghost"
               size="sm"
@@ -275,11 +263,6 @@ const AlumniDashboard = () => {
                   <span className="flex items-center gap-1.5">
                     <Briefcase className="w-4 h-4" />
                     {profile?.job_title} at {profile?.company}
-                  </span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-200"></span>
-                  <span className="flex items-center gap-1.5">
-                    <ShieldCheck className="w-4 h-4 text-green-500" />
-                    {profile?.is_verified ? "Verified Alumni" : "Pending Verification"}
                   </span>
                 </div>
               </div>
