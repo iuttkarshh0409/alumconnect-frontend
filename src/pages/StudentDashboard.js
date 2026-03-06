@@ -64,7 +64,9 @@ const StudentDashboard = () => {
       setStats(statsRes.data);
 
       // 4. Fetch Campus Leaderboard (Alumni by Program)
-      const leaderboardRes = await axios.get(`${API_URL}/api/analytics/programs/count`);
+      const leaderboardRes = await axios.get(`${API_URL}/api/analytics/programs/count`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setLeaderboard(leaderboardRes.data.slice(0, 3));
 
     } catch (error) {
