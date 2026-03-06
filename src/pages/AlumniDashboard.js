@@ -414,35 +414,67 @@ const AlumniDashboard = () => {
             <StatMiniCard title="Active Sessions" val={acceptedRequests} icon={Users} color="bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-500" />
           </div>
 
-          {/* Bomb 2: Influence Meter */}
+          {/* Bomb 2: Improvised Influence Meter */}
           <div className="md:col-span-4 h-full">
-             <Card className="h-full border-none bg-gradient-to-br from-[#002147] to-[#0F3057] dark:from-slate-900 dark:to-slate-950 text-white shadow-xl shadow-[#002147]/20 dark:shadow-black/50 p-8 rounded-[2rem] relative overflow-hidden group transition-all duration-300">
-               <TrendingUp className="absolute -top-4 -right-4 w-24 h-24 text-white/5 rotate-12 group-hover:scale-125 transition-transform duration-700" />
-               <div className="relative z-10 flex flex-col justify-between h-full">
+            <motion.div
+              whileHover={{ y: -5 }}
+              className="h-full"
+            >
+              <Card className="h-full border-none bg-[#001529] dark:bg-slate-950 text-white shadow-2xl shadow-[#002147]/40 dark:shadow-black/60 p-8 rounded-[2.5rem] relative overflow-hidden group transition-all duration-500 border border-white/5">
+                {/* Dynamic Ambient Glow */}
+                <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-600/20 rounded-full blur-[100px] group-hover:bg-blue-500/30 transition-colors duration-700" />
+                <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-orange-600/10 rounded-full blur-[100px]" />
+                
+                <TrendingUp className="absolute top-6 right-6 w-12 h-12 text-white/10 group-hover:text-white/20 group-hover:rotate-12 transition-all duration-700" />
+                
+                <div className="relative z-10 flex flex-col justify-between h-full">
                   <div>
-                    <div className="flex justify-between items-center mb-6">
-                      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50">Influence Meter</p>
-                      <Badge className="bg-white/10 text-white border-none text-[10px] uppercase font-bold tracking-tighter">Level 4: Master</Badge>
+                    <div className="flex justify-between items-center mb-8">
+                      <div className="space-y-1">
+                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Influence Meter</p>
+                        <div className="h-0.5 w-8 bg-orange-500 rounded-full" />
+                      </div>
+                      <Badge className="bg-white/5 hover:bg-white/10 text-white border border-white/10 text-[9px] uppercase font-black tracking-widest px-3 py-1 backdrop-blur-md">
+                        Level 4: Master
+                      </Badge>
                     </div>
-                    <h3 className="text-2xl font-serif font-black mb-1">Impact Score</h3>
-                    <p className="text-xs text-white/40 mb-4 italic">Next rank: Campus Legend</p>
+                    
+                    <h3 className="text-3xl font-serif font-black mb-2 tracking-tight">Impact <span className="text-white/40">Score</span></h3>
+                    <div className="flex items-center gap-2">
+                       <Zap className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                       <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest">Next: Campus Legend</p>
+                    </div>
                   </div>
                   
-                  <div className="mt-auto">
-                    <div className="flex justify-between items-end mb-2">
-                       <span className="text-3xl font-black">{currentImpactCount}k</span>
-                       <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Points</span>
+                  <div className="mt-auto space-y-6">
+                    <div className="flex justify-between items-end">
+                       <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-5xl font-black tracking-tighter">{currentImpactCount}k</span>
+                            <Badge className="bg-green-500/20 text-green-400 border-none text-[8px] font-black">+12%</Badge>
+                          </div>
+                          <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Total Influence Points</p>
+                       </div>
                     </div>
-                    <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                      <motion.div 
-                        initial={{ width: 0 }}
-                        animate={{ width: `${impactProgress}%` }}
-                        className="h-full bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-full"
-                      />
+                    
+                    <div className="space-y-3">
+                      <div className="w-full h-3 bg-white/5 rounded-full overflow-hidden p-0.5 border border-white/5">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${impactProgress}%` }}
+                          className="h-full bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-full shadow-[0_0_15px_rgba(249,115,22,0.5)]"
+                        />
+                      </div>
+                      <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-white/30">
+                         <span>Expert</span>
+                         <span className="text-white/60">{100 - impactProgress}% to Level 5</span>
+                         <span>Legend</span>
+                      </div>
                     </div>
                   </div>
-               </div>
-             </Card>
+                </div>
+              </Card>
+            </motion.div>
           </div>
         </section>
 
