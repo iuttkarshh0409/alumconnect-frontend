@@ -45,7 +45,7 @@ const PRO_TIPS = [
   },
   {
     text: "Building projects is better than just watching tutorials. Ship it!",
-    author: "Neha (Fullstack @ Zomato)",
+    author: "Yashvi (Fullstack @ Zomato)",
   },
   {
     text: "Networking is not just asking for jobs; it's asking for advice.",
