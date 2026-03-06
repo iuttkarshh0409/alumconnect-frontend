@@ -336,69 +336,101 @@ const AlumniDashboard = () => {
 
               <Dialog open={editMode} onOpenChange={setEditMode}>
                 <DialogTrigger asChild>
-                  <Button className="bg-[#002147] dark:bg-slate-200 dark:text-[#002147] hover:bg-[#003366] dark:hover:bg-white text-white rounded-xl px-8 py-6 h-auto text-lg font-bold shadow-xl shadow-[#002147]/20 dark:shadow-black/20 transition-all hover:scale-[1.02] active:scale-[0.98] group">
-                    <Edit className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" />
-                    Update Profile
+                  <Button className="bg-[#002147] dark:bg-slate-200 dark:text-[#002147] hover:bg-[#003366] dark:hover:bg-white text-white rounded-2xl px-8 py-6 h-auto text-lg font-black shadow-2xl shadow-[#002147]/30 dark:shadow-black/60 transition-all hover:scale-[1.05] hover:rotate-1 active:scale-95 group border border-white/10">
+                    <Edit className="w-5 h-5 mr-3 group-hover:rotate-12 transition-transform" />
+                    Master Profile
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col p-0 rounded-3xl border-none shadow-2xl dark:bg-slate-900">
-                  <DialogHeader className="p-8 bg-[#002147] dark:bg-slate-950 text-white">
-                    <DialogTitle className="text-2xl font-serif font-bold">Edit Professional Profile</DialogTitle>
-                    <DialogDescription className="text-white/60">
-                      Keep your professional details updated to help students find the right mentorship.
+                <DialogContent className="max-w-xl max-h-[90vh] overflow-hidden flex flex-col p-0 rounded-[3rem] border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.3)] bg-white dark:bg-[#000a12]">
+                  <DialogHeader className="p-10 bg-gradient-to-br from-[#002147] via-[#0a3d62] to-[#001529] text-white relative overflow-hidden">
+                    <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
+                    <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                    
+                    <DialogTitle className="text-3xl font-serif font-black tracking-tighter flex items-center gap-3 relative z-10">
+                      <div className="p-2 bg-white/10 rounded-xl backdrop-blur-md">
+                        <User className="w-6 h-6 text-white" />
+                      </div>
+                      Expert Persona
+                    </DialogTitle>
+                    <DialogDescription className="text-white/50 font-bold tracking-tight text-sm mt-2 relative z-10">
+                      Sync your professional identity with the campus network.
                     </DialogDescription>
                   </DialogHeader>
-                  <div className="p-8 overflow-y-auto space-y-6 flex-1 dark:bg-slate-900">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Company</Label>
+
+                  <div className="p-10 overflow-y-auto space-y-8 flex-1 custom-scrollbar">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-3 px-1">
+                        <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-1 flex items-center gap-2">
+                           <Briefcase className="w-3 h-3" /> Company
+                        </Label>
                         <Input
                           value={profileUpdate.company}
                           onChange={(e) => setProfileUpdate({ ...profileUpdate, company: e.target.value })}
-                          className="rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-950"
+                          className="rounded-2xl border-slate-100 dark:border-white/5 dark:bg-slate-900/50 h-12 font-bold px-4 focus-visible:ring-orange-500/50"
+                          placeholder="Acme Corp"
                         />
                       </div>
-                      <div className="space-y-2">
-                        <Label className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Job Title</Label>
+                      <div className="space-y-3 px-1">
+                        <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-1 flex items-center gap-2">
+                          <User className="w-3 h-3" /> Job Title
+                        </Label>
                         <Input
                           value={profileUpdate.job_title}
                           onChange={(e) => setProfileUpdate({ ...profileUpdate, job_title: e.target.value })}
-                          className="rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-950"
+                          className="rounded-2xl border-slate-100 dark:border-white/5 dark:bg-slate-900/50 h-12 font-bold px-4 focus-visible:ring-blue-500/50"
+                          placeholder="SDE II"
                         />
                       </div>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">LinkedIn URL</Label>
+
+                    <div className="space-y-3 px-1">
+                        <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-1 flex items-center gap-2">
+                          <Linkedin className="w-3 h-3 text-[#0077B5]" /> LinkedIn Professional URL
+                        </Label>
                         <Input
                           value={profileUpdate.linkedin_url}
                           onChange={(e) => setProfileUpdate({ ...profileUpdate, linkedin_url: e.target.value })}
-                          className="rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-950"
+                          className="rounded-2xl border-slate-100 dark:border-white/5 dark:bg-slate-900/50 h-12 font-bold px-4 focus-visible:ring-[#0077B5]/50"
+                          placeholder="linkedin.com/in/username"
                         />
                     </div>
-                    <div className="space-y-2">
-                      <Label className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Skills (comma-separated)</Label>
+
+                    <div className="space-y-3 px-1">
+                      <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-1 flex items-center gap-2">
+                        <Target className="w-3 h-3 text-orange-500" /> Core Disciplines (Expertise)
+                      </Label>
                       <Input
                         value={profileUpdate.skills}
                         onChange={(e) => setProfileUpdate({ ...profileUpdate, skills: e.target.value })}
-                        className="rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-950"
+                        className="rounded-2xl border-slate-100 dark:border-white/5 dark:bg-slate-900/50 h-12 font-bold px-4"
+                        placeholder="React, AWS, Python..."
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Short Bio</Label>
+
+                    <div className="space-y-3 px-1 pb-4">
+                      <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-1 flex items-center gap-2">
+                         <MessageSquareQuote className="w-3 h-3 text-blue-500" /> Professional Legacy (Bio)
+                      </Label>
                       <Textarea
                         value={profileUpdate.bio}
                         onChange={(e) => setProfileUpdate({ ...profileUpdate, bio: e.target.value })}
                         rows={4}
-                        className="rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-950 resize-none"
+                        className="rounded-[2rem] border-slate-100 dark:border-white/5 dark:bg-slate-900/50 p-6 font-bold text-sm tracking-tight leading-relaxed italic resize-none"
+                        placeholder="Share a glimpse of your journey..."
                       />
                     </div>
                   </div>
-                  <DialogFooter className="p-6 bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 rounded-b-3xl">
+
+                  <DialogFooter className="p-8 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-white/5">
                     <Button
                       onClick={handleUpdateProfile}
-                      className="w-full bg-[#002147] dark:bg-slate-200 dark:text-[#002147] hover:bg-[#003366] dark:hover:bg-white text-white rounded-xl h-12 font-bold shadow-lg shadow-[#002147]/10"
+                      className="w-full bg-[#002147] dark:bg-white dark:text-[#002147] hover:bg-[#003366] dark:hover:bg-slate-200 text-white rounded-[1.5rem] h-14 text-lg font-black shadow-xl shadow-[#002147]/20 dark:shadow-black/40 group relative overflow-hidden transition-all duration-300 active:scale-[0.98]"
                     >
-                      Save Professional Profile
+                      <span className="relative z-10 flex items-center gap-2">
+                         Update Expert Persona
+                         <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                      </span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 opacity-0 group-hover:opacity-10 transition-opacity" />
                     </Button>
                   </DialogFooter>
                 </DialogContent>
