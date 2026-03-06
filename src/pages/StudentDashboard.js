@@ -289,6 +289,7 @@ const StudentDashboard = () => {
                     <MentorshipRequestCard
                       request={request}
                       userRole="student"
+                      onUpdate={fetchData}
                     />
                   </motion.div>
                 ))}

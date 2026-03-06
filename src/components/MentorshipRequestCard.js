@@ -65,6 +65,23 @@ const MentorshipRequestCard = ({ request, userRole, onUpdate }) => {
   const displayUser =
     userRole === "student" ? request.mentor : request.student;
 
+  const handleWithdraw = async () => {
+    try {
+      const token = await getToken();
+      await axios.delete(
+        `${API_URL}/api/mentorship/requests/${request.request_id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      toast.success("Request withdrawn");
+      if (onUpdate) onUpdate();
+    } catch (error) {
+      toast.error("Failed to withdraw request");
+    }
+  };
+
   return (
     <div
       data-testid={`mentorship-request-card-${request.request_id}`}
@@ -95,7 +112,7 @@ const MentorshipRequestCard = ({ request, userRole, onUpdate }) => {
                 variant="ghost"
                 size="sm"
                 className="h-8 px-3 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg flex items-center gap-2 font-bold text-[10px] transition-all active:scale-95 border border-red-100/30 hover:border-red-100"
-                onClick={() => toast.info("Withdrawal feature coming soon!")}
+                onClick={handleWithdraw}
               >
                 <Trash2 className="w-3 h-3" />
                 Withdraw Request
