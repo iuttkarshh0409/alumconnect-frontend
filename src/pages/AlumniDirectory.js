@@ -564,30 +564,46 @@ const AlumniDirectory = () => {
                         </button>
                       ))}
                     </div>
-
                     <CardHeader className="flex flex-row items-center gap-4 space-y-0 pb-6">
-                      <Avatar className="w-14 h-14 border-2 border-slate-50 group-hover:border-[#002147]/20 transition-colors">
-                        <AvatarImage src={alum.user?.picture} />
-                        <AvatarFallback className="bg-[#002147]/5 text-[#002147] font-bold text-lg">
-                          {getInitials(alum.user?.name)}
-                        </AvatarFallback>
-                      </Avatar>
+                      <div className="relative">
+                        <Avatar className={`w-14 h-14 border-2 transition-all duration-300 ${alum.is_live ? 'border-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.5)]' : currentUserProfile?.department === alum.department ? 'border-rose-400 shadow-[0_0_10px_rgba(244,63,94,0.3)]' : 'border-slate-50'}`}>
+                          <AvatarImage src={alum.user?.picture} />
+                          <AvatarFallback className="bg-[#002147]/5 text-[#002147] font-bold text-lg">
+                            {getInitials(alum.user?.name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        {alum.is_live && (
+                          <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-blue-500 border-2 border-white rounded-full flex items-center justify-center">
+                            <span className="absolute inset-0 rounded-full bg-blue-500 animate-ping opacity-75"></span>
+                          </span>
+                        )}
+                      </div>
                       <div className="flex-1 overflow-hidden">
-                        <CardTitle className="text-xl font-bold text-[#002147] truncate group-hover:text-[#002147]/80 transition-colors flex items-center gap-2">
+                        <CardTitle className="text-xl font-bold text-[#002147] truncate group-hover:text-[#002147]/80 transition-colors flex flex-wrap items-center gap-2">
                           {alum.user?.name}
-                          {alum.is_live && (
-                            <div className="bg-blue-500 text-white text-[8px] px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
-                              <Zap className="w-2 h-2 fill-white" />
-                              LIVE
-                            </div>
-                          )}
-                          {/* Feature 2: The Bridge (Department Match) */}
-                          {currentUserProfile?.department === alum.department && (
-                            <div className="bg-rose-500 text-white text-[8px] px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
-                              <Heart className="w-2 h-2 fill-white" />
-                              MATCH
-                            </div>
-                          )}
+                          <div className="flex gap-1.5">
+                            {alum.is_live && (
+                              <motion.div 
+                                initial={{ scale: 0.9 }}
+                                animate={{ scale: 1 }}
+                                transition={{ repeat: Infinity, duration: 2, repeatType: "reverse" }}
+                                className="bg-gradient-to-r from-blue-600 to-blue-400 text-white text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm"
+                              >
+                                <div className="w-1 h-1 bg-white rounded-full animate-pulse" />
+                                LIVE
+                              </motion.div>
+                            )}
+                            {/* Feature 2: The Bridge (Department Match) */}
+                            {currentUserProfile?.department === alum.department && (
+                              <motion.div 
+                                whileHover={{ scale: 1.05 }}
+                                className="bg-gradient-to-r from-rose-500 to-orange-400 text-white text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm"
+                              >
+                                <Heart className="w-2 h-2 fill-white" />
+                                MATCH
+                              </motion.div>
+                            )}
+                          </div>
                         </CardTitle>
                         <CardDescription className="flex items-center gap-1 text-slate-500">
                           <GraduationCap className="w-3.5 h-3.5" />
