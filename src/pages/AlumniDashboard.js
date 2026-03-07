@@ -81,6 +81,7 @@ const AlumniDashboard = () => {
     pending_requests: 0,
     is_live: false
   });
+  const [radarStudents, setRadarStudents] = useState([]);
   const [wisdomText, setWisdomText] = useState("");
   const [isPostingWisdom, setIsPostingWisdom] = useState(false);
   
@@ -171,6 +172,12 @@ const AlumniDashboard = () => {
       });
       setAlumniStats(statsResponse.data);
       setIsLiveNow(statsResponse.data.is_live);
+
+      // Fetch radar data
+      const radarResponse = await axios.get(`${API_URL}/api/alumni/talent-radar`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setRadarStudents(radarResponse.data);
     } catch (error) {
       console.error(error);
       toast.error("Failed to load dashboard data");
@@ -741,7 +748,72 @@ const AlumniDashboard = () => {
 
           {/* MAIN CONTENT (RIGHT) */}
           <div className="lg:col-span-8 space-y-12">
-            
+            {/* Radar: Talent Scouting AI */}
+            <section className="bg-slate-950 rounded-[3rem] p-8 relative overflow-hidden group shadow-2xl border border-blue-500/20">
+              <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.1)_0%,transparent_70%)] pointer-events-none" />
+              
+              <div className="relative z-10 flex flex-col xl:flex-row items-center gap-12">
+                <div className="flex-1 space-y-6">
+                  <div className="space-y-2 text-center xl:text-left">
+                     <Badge className="bg-blue-500/10 text-blue-400 border-none px-3 py-1 font-black text-[9px] uppercase tracking-widest">AI Matching Active</Badge>
+                     <h2 className="text-4xl font-black text-white tracking-tighter leading-none">TALENT<br/>RADAR <span className="text-blue-500">2.0</span></h2>
+                  </div>
+                  <p className="text-slate-400 text-sm font-medium leading-relaxed max-w-sm text-center xl:text-left">
+                     Our AI scan has identified <span className="text-white font-bold">{radarStudents?.length || 0} high-potential students</span> from your department matching your tech domain.
+                  </p>
+                  <div className="flex gap-4 justify-center xl:justify-start">
+                     <Button className="bg-blue-600 hover:bg-blue-500 text-white rounded-full px-6 font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-500/20 transition-all active:scale-95">Initiate Scout</Button>
+                     <Button variant="outline" className="border-white/10 text-white/60 hover:text-white rounded-full px-6 font-black text-[10px] uppercase tracking-widest bg-transparent">Settings</Button>
+                  </div>
+                </div>
+
+                <div className="relative w-72 h-72 flex items-center justify-center">
+                   <div className="absolute inset-0 border border-blue-500/10 rounded-full scale-100" />
+                   <div className="absolute inset-0 border border-blue-500/10 rounded-full scale-75" />
+                   <div className="absolute inset-0 border border-blue-500/10 rounded-full scale-50" />
+                   <div className="absolute inset-0 border border-blue-500/10 rounded-full scale-25" />
+                   
+                   <motion.div 
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                    className="absolute w-1/2 h-1/2 top-0 left-1/2 origin-bottom-left"
+                    style={{ background: 'linear-gradient(22deg, rgba(59,130,246,0.2) 0%, transparent 60%)', clipPath: 'polygon(0 100%, 100% 0, 100% 100%)' }}
+                   />
+
+                   {radarStudents?.map((s, i) => (
+                     <motion.div
+                      key={s.user_id}
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.5 }}
+                      className="absolute z-20"
+                      style={{ 
+                        left: `calc(50% + ${(s.distance * 130) * Math.cos(s.angle * (Math.PI / 180))}px)`,
+                        top: `calc(50% + ${(s.distance * 130) * Math.sin(s.angle * (Math.PI / 180))}px)`
+                      }}
+                     >
+                        <div className="group/blip relative">
+                          <motion.div 
+                            animate={{ scale: [1, 1.5, 1] }} 
+                            transition={{ repeat: Infinity, duration: 2 }}
+                            className="w-3 h-3 rounded-full bg-blue-500/20 border border-blue-400 absolute -inset-1" 
+                          />
+                          <Avatar className="w-8 h-8 border-2 border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.3)] cursor-pointer hover:scale-125 transition-all">
+                            <AvatarImage src={s.picture} />
+                            <AvatarFallback className="bg-blue-600 text-[8px] text-white font-black">{s.name[0]}</AvatarFallback>
+                          </Avatar>
+                          
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-32 bg-slate-900 border border-white/10 rounded-xl p-2 opacity-0 group-hover/blip:opacity-100 transition-all pointer-events-none z-30 shadow-2xl">
+                             <p className="text-[10px] font-black text-white truncate">{s.name}</p>
+                             <p className="text-[8px] font-bold text-blue-400 uppercase">{s.match_score}% Match</p>
+                          </div>
+                        </div>
+                     </motion.div>
+                   ))}
+                </div>
+              </div>
+            </section>
+
             {/* Bomb 1: Wisdom Engine Console */}
             <section className="bg-white dark:bg-slate-900 p-8 rounded-[3rem] border border-slate-100 dark:border-white/5 shadow-sm transition-colors relative overflow-hidden">
               <div className="absolute -top-24 -right-24 w-48 h-48 bg-orange-500/5 rounded-full blur-3xl" />
