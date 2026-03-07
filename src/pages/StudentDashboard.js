@@ -102,8 +102,8 @@ const StudentDashboard = () => {
       const wisdomRes = await axios.get(`${API_URL}/api/student/wisdom`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (wisdomRes.data) {
-        setProTips(wisdomRes.data);
+      if (wisdomRes.data && wisdomRes.data.length > 0) {
+        setProTips([...wisdomRes.data, ...PRO_TIPS]);
       }
 
     } catch (error) {
@@ -129,7 +129,9 @@ const StudentDashboard = () => {
       const wisdomRes = await axios.get(`${API_URL}/api/student/wisdom`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setProTips(wisdomRes.data);
+      if (wisdomRes.data && wisdomRes.data.length > 0) {
+        setProTips([...wisdomRes.data, ...PRO_TIPS]);
+      }
       toast.success("High-five sent!");
     } catch (error) {
       toast.error("Action failed");

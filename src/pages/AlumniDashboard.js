@@ -154,6 +154,15 @@ const AlumniDashboard = () => {
         linkedin_url: pData.linkedin_url || "",
       });
 
+      const requestsResponse = await axios.get(`${API_URL}/api/mentorship/requests`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const enrichedRequests = requestsResponse.data.map(req => ({
+        ...req,
+        isPriority: req.topic.toLowerCase().includes('interview') || req.description.toLowerCase().includes('faang') || req.description.length > 100
+      }));
+
       setRequests(enrichedRequests);
 
       // Fetch personal stats
