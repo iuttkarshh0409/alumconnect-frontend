@@ -173,11 +173,16 @@ const AlumniDashboard = () => {
       setAlumniStats(statsResponse.data);
       setIsLiveNow(statsResponse.data.is_live);
 
-      // Fetch radar data
-      const radarResponse = await axios.get(`${API_URL}/api/alumni/talent-radar`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setRadarStudents(radarResponse.data);
+      // Fetch radar data (Resilient fetch to prevent dashboard crash if backend not yet updated)
+      try {
+        const radarResponse = await axios.get(`${API_URL}/api/alumni/talent-radar`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setRadarStudents(radarResponse.data);
+      } catch (err) {
+        console.warn("Talent Radar endpoint not available yet. Please push backend changes.");
+        setRadarStudents([]); // Fallback to empty
+      }
     } catch (error) {
       console.error(error);
       toast.error("Failed to load dashboard data");
