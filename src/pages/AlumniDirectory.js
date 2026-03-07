@@ -114,14 +114,6 @@ const AlumniDirectory = () => {
         .map(([name, count]) => ({ name, count }));
       setLocationStats(sortedLocs);
 
-      // Feature 2: Fetch Current User Profile once to enable "The Bridge" matching
-      if (!currentUserProfile) {
-        const profileRes = await axios.get(`${API_URL}/api/auth/me`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setCurrentUserProfile(profileRes.data);
-      }
-
       // Feature 2: Calculate Heatmap Stats
       const stats = response.data.reduce((acc, alum) => {
         if (alum.is_live) acc.activeMentors++;
@@ -151,6 +143,23 @@ const AlumniDirectory = () => {
       setLoading(false);
     }
   }, [filters, getToken, isLoaded, isSignedIn]);
+
+  // Decoupled Current User Fetch (Feature 2)
+  useEffect(() => {
+    const fetchMe = async () => {
+      if (!isLoaded || !isSignedIn || currentUserProfile) return;
+      try {
+        const token = await getToken();
+        const profileRes = await axios.get(`${API_URL}/api/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setCurrentUserProfile(profileRes.data);
+      } catch (err) {
+        console.error("Failed to fetch current user", err);
+      }
+    };
+    fetchMe();
+  }, [isLoaded, isSignedIn, getToken, currentUserProfile]);
 
   useEffect(() => {
     fetchAlumni();
