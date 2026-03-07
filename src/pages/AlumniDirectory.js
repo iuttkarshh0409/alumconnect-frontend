@@ -45,6 +45,9 @@ import {
   ArrowRight,
   Globe,
   MapPin,
+  LayoutGrid,
+  Activity,
+  ShieldCheck,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -63,7 +66,7 @@ const AlumniDirectory = () => {
     skills: "",
   });
 
-  // New Expert Operations States
+  const [searchTerm, setSearchTerm] = useState("");
   const [featuredAlumni, setFeaturedAlumni] = useState([]);
   const [heatmapStats, setHeatmapStats] = useState({
     activeMentors: 0,
@@ -100,7 +103,16 @@ const AlumniDirectory = () => {
         }
       );
 
-      setAlumni(response.data);
+      let filteredData = response.data;
+      if (searchTerm) {
+        filteredData = filteredData.filter(a => 
+          a.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          a.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          a.job_domain?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+
+      setAlumni(filteredData);
 
       // Feature 3: Calculate Global Footprint (Location Stats)
       const locations = response.data.map(a => a.city || a.country).filter(Boolean);
@@ -121,7 +133,6 @@ const AlumniDirectory = () => {
         return acc;
       }, { activeMentors: 0, openRefers: 0 });
 
-      // Find top domain
       const domains = response.data.map(a => a.job_domain).filter(Boolean);
       const topDomain = domains.sort((a,b) =>
         domains.filter(v => v===a).length - domains.filter(v => v===b).length
@@ -130,10 +141,9 @@ const AlumniDirectory = () => {
       setHeatmapStats({
         ...stats,
         topDomain,
-        topSkill: "React.js" // Mock for now or extract from skills
+        topSkill: "React.js" 
       });
 
-      // Feature 1: Populate Featured Track
       const featured = response.data.filter(a => a.open_to_refer || a.is_live);
       setFeaturedAlumni(featured.slice(0, 10));
 
@@ -142,9 +152,8 @@ const AlumniDirectory = () => {
     } finally {
       setLoading(false);
     }
-  }, [filters, getToken, isLoaded, isSignedIn]);
+  }, [filters, searchTerm, getToken, isLoaded, isSignedIn]);
 
-  // Decoupled Current User Fetch (Feature 2)
   useEffect(() => {
     const fetchMe = async () => {
       if (!isLoaded || !isSignedIn || currentUserProfile) return;
@@ -165,10 +174,6 @@ const AlumniDirectory = () => {
     fetchAlumni();
   }, [fetchAlumni]);
 
-  const handleSearch = () => {
-    fetchAlumni();
-  };
-
   const clearFilters = () => {
     setFilters({
       company: "",
@@ -176,22 +181,15 @@ const AlumniDirectory = () => {
       graduation_year: "",
       skills: "",
     });
+    setSearchTerm("");
   };
 
   const handleLogout = async () => {
     try {
       const token = await getToken();
-
-      await axios.post(
-        `${API_URL}/api/auth/logout`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      await axios.post(`${API_URL}/api/auth/logout`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       navigate("/");
     } catch {
       toast.error("Logout failed");
@@ -199,8 +197,7 @@ const AlumniDirectory = () => {
   };
 
   const handleAction = (e, type, alumName) => {
-    e.stopPropagation(); // Don't trigger the card's profile navigation
-    
+    e.stopPropagation();
     switch(type) {
       case 'save':
         toast.success(`Bookmarked ${alumName.split(' ')[0]} to your network`, {
@@ -229,12 +226,7 @@ const AlumniDirectory = () => {
 
   const getInitials = (name) => {
     if (!name) return "??";
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+    return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
   };
 
   const SkeletonCard = () => (
@@ -261,7 +253,7 @@ const AlumniDirectory = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] text-slate-900">
+    <div className="min-h-screen bg-[#FDFDFD] text-slate-900 flex flex-col">
       {/* HEADER */}
       <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
@@ -274,419 +266,297 @@ const AlumniDirectory = () => {
             </h1>
           </div>
 
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate(-1)}
-              className="hidden sm:flex border-slate-200 text-slate-600 hover:bg-slate-50"
-            >
-              Back
-            </Button>
-
-            <Button
-              variant="default"
-              size="sm"
-              onClick={handleLogout}
-              className="bg-[#002147] hover:bg-[#003366] text-white shadow-sm"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
+          <div className="flex items-center gap-6">
+            <div className="flex gap-3">
+              <Button
+                variant="default"
+                size="sm"
+                onClick={handleLogout}
+                className="bg-[#002147] hover:bg-[#003366] text-white shadow-sm px-4 rounded-xl"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-12">
-        <div className="mb-12">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <h2 className="font-serif text-5xl font-extrabold text-[#002147] mb-4 tracking-tight">
-              Connect with the Pioneers
-            </h2>
-            <p className="text-xl text-slate-500 max-w-2xl font-light leading-relaxed">
-              Explore your professional network. Connect with mentors, peers, and industry leaders from our verified alumni community.
-            </p>
-
-            {/* Feature 3: Global Footprint Ticker */}
-            {locationStats.length > 0 && (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="mt-6 flex flex-wrap items-center gap-3"
-              >
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 rounded-full border border-blue-100/50">
-                  <Globe className="w-3.5 h-3.5 text-blue-500 animate-pulse" />
-                  <span className="text-[10px] font-bold text-blue-600 uppercase tracking-tighter">Worldwide Clusters</span>
-                </div>
-                {locationStats.map((loc, i) => (
-                  <div key={i} className="flex items-center gap-1.5 group">
-                    <MapPin className="w-3 h-3 text-slate-300 group-hover:text-rose-500 transition-colors" />
-                    <span className="text-xs font-semibold text-slate-600">{loc.name}</span>
-                    <span className="text-[10px] text-slate-400">({loc.count})</span>
-                    {i < locationStats.length - 1 && <span className="text-slate-200 ml-1">•</span>}
+      <main className="max-w-7xl mx-auto px-6 py-12 flex-1 w-full">
+        <div className="flex flex-col lg:flex-row gap-10 items-start">
+          {/* SIDEBAR COMMAND CENTER */}
+          <aside className="lg:w-80 w-full space-y-6 lg:sticky lg:top-24">
+            {/* Professional Summary Context */}
+            {currentUserProfile && (
+              <div className="p-6 rounded-3xl bg-gradient-to-br from-[#002147] to-[#003366] text-white shadow-xl relative overflow-hidden group">
+                <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-700" />
+                <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-4">Verification Status</p>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/10 shadow-inner">
+                    <ShieldCheck className="w-5 h-5 text-amber-400" />
                   </div>
-                ))}
-              </motion.div>
+                  <div>
+                    <h4 className="font-bold text-sm leading-tight">{currentUserProfile.user?.name}</h4>
+                    <p className="text-[10px] text-white/50">{currentUserProfile.department}</p>
+                  </div>
+                </div>
+                <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
+                  <motion.div initial={{ width: 0 }} animate={{ width: "75%" }} className="h-full bg-amber-400" />
+                </div>
+              </div>
             )}
-            </motion.div>
-        </div>
 
-        {/* FEATURE 2: EXPERT HEATMAP BAR */}
-        <section className="mb-10">
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="grid grid-cols-2 lg:grid-cols-4 gap-4"
-          >
-            {[
-              { label: "Active Mentors", value: heatmapStats.activeMentors, icon: Zap, color: "text-blue-500", bg: "bg-blue-50" },
-              { label: "Top Domain", value: heatmapStats.topDomain, icon: Target, color: "text-purple-500", bg: "bg-purple-50" },
-              { label: "Hot Skill", value: heatmapStats.topSkill, icon: Sparkles, color: "text-amber-500", bg: "bg-amber-50" },
-              { label: "Open Refers", value: heatmapStats.openRefers, icon: Heart, color: "text-rose-500", bg: "bg-rose-50" }
-            ].map((stat, i) => (
-              <div key={i} className={`flex items-center gap-4 p-4 rounded-2xl border border-slate-100 bg-white/60 backdrop-blur-sm shadow-sm`}>
-                <div className={`w-10 h-10 ${stat.bg} ${stat.color} rounded-xl flex items-center justify-center`}>
-                  <stat.icon className="w-5 h-5" />
+            {/* Advanced Discovery Dashboard */}
+            <div className="p-6 rounded-3xl bg-white border border-slate-100 shadow-sm space-y-6">
+              <div className="flex items-center justify-between border-b border-slate-50 pb-4">
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-[#002147]" />
+                  <h3 className="font-bold text-[#002147] text-sm">Discovery Hub</h3>
                 </div>
-                <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
-                  <p className="text-lg font-bold text-slate-900">{stat.value}</p>
-                </div>
+                <Activity className="w-3.5 h-3.5 text-blue-500 animate-pulse" />
               </div>
-            ))}
-          </motion.div>
-        </section>
 
-        {/* FEATURE 1: PRIORITY REFERRAL TRACK (Horizontal Scroll) */}
-        {featuredAlumni.length > 0 && (
-          <section className="mb-12 overflow-hidden">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center text-white">
-                  <Sparkles className="w-4 h-4" />
-                </div>
-                <h3 className="text-xl font-bold text-[#002147]">Priority Referral Track</h3>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="ghost" size="sm" className="text-slate-400 hover:text-[#002147]">
-                  View All <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
-              </div>
-            </div>
-            
-            <div className="flex gap-6 overflow-x-auto pb-6 -mx-2 px-2 no-scrollbar scroll-smooth">
-              {featuredAlumni.map((alum, i) => (
-                <motion.div
-                  key={`featured-${alum.user_id}`}
-                  whileHover={{ y: -5 }}
-                  className="flex-shrink-0 w-72"
-                >
-                  <Card 
-                    className="relative overflow-hidden border-none shadow-lg bg-[#002147] text-white p-5 h-40 flex flex-col justify-between cursor-pointer group"
-                    onClick={() => navigate(`/profile/${alum.user_id}`)}
-                  >
-                    {/* Decorative Elements */}
-                    <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-colors" />
-                    
-                    <div className="flex items-start gap-4 z-10">
-                      <Avatar className="w-12 h-12 border-2 border-white/20">
-                        <AvatarImage src={alum.user?.picture} />
-                        <AvatarFallback className="bg-white/10 text-white">
-                          {getInitials(alum.user?.name)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="overflow-hidden">
-                        <p className="font-bold truncate">{alum.user?.name}</p>
-                        <p className="text-xs text-white/60 truncate">{alum.job_title} @ {alum.company}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between z-10">
-                      <Badge className="bg-amber-400/20 text-amber-300 border-none text-[10px]">
-                        OPEN TO REFER
-                      </Badge>
-                      <div className="flex -space-x-2">
-                         {/* Mock mutual connections or just decorative */}
-                         <div className="w-6 h-6 rounded-full border-2 border-[#002147] bg-blue-400 flex items-center justify-center text-[8px]">DS</div>
-                         <div className="w-6 h-6 rounded-full border-2 border-[#002147] bg-green-400 flex items-center justify-center text-[8px]">AK</div>
-                      </div>
-                    </div>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* FILTERS */}
-        <section className="mb-12">
-          <Card className="border-slate-200 shadow-sm overflow-hidden bg-white/50 backdrop-blur-sm">
-            <CardHeader className="pb-4 bg-slate-50/50 border-b border-slate-100">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-[#002147]">
-                  <Filter className="w-5 h-5" />
-                  <CardTitle className="text-lg font-bold">Search Filters</CardTitle>
-                </div>
-                {(filters.company || filters.job_domain || filters.graduation_year || filters.skills) && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={clearFilters}
-                    className="text-slate-500 hover:text-red-500 text-xs h-8"
-                  >
-                    <X className="w-3 h-3 mr-1" /> Clear All
-                  </Button>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Company</label>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                    <Input
-                      placeholder="e.g. Google, Amazon"
-                      value={filters.company}
-                      onChange={(e) => setFilters({ ...filters, company: e.target.value })}
-                      className="pl-9 border-slate-200 focus-visible:ring-[#002147]"
+              <div className="space-y-5">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Universal Search</label>
+                  <div className="relative group">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                    <Input 
+                      placeholder="Find talent..." 
+                      className="pl-9 h-11 bg-slate-50/50 border-transparent focus:bg-white focus:border-slate-200 rounded-xl text-xs font-medium"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Job Domain</label>
-                  <Select
-                    value={filters.job_domain}
-                    onValueChange={(value) => setFilters({ ...filters, job_domain: value })}
-                  >
-                    <SelectTrigger className="border-slate-200 focus:ring-[#002147]">
-                      <SelectValue placeholder="All Domains" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Domains</SelectItem>
-                      <SelectItem value="SDE">Software Engineering</SelectItem>
-                      <SelectItem value="PM">Product Management</SelectItem>
-                      <SelectItem value="HR">Human Resources</SelectItem>
-                      <SelectItem value="Marketing">Marketing & Sales</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                {[
+                  { label: "Job Domain", key: "job_domain", icon: LayoutGrid, options: ["Engineering", "Product", "Design", "Marketing", "Finance"] },
+                  { label: "Target Company", key: "company", icon: Building2, options: ["Google", "Microsoft", "Amazon", "Meta", "Tesla"] },
+                  { label: "Graduation", key: "graduation_year", icon: GraduationCap, options: ["2024", "2023", "2022", "2021", "2020"] },
+                ].map((f, i) => (
+                  <div key={i} className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-1.5">
+                      <f.icon className="w-3 h-3" /> {f.label}
+                    </label>
+                    <Select
+                      value={filters[f.key]}
+                      onValueChange={(val) => setFilters({ ...filters, [f.key]: val })}
+                    >
+                      <SelectTrigger className="h-11 rounded-xl border-slate-100 bg-slate-50/50 hover:bg-white transition-all text-xs">
+                        <SelectValue placeholder={`Select ${f.label}`} />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-2xl border-slate-100">
+                        <SelectItem value="all">All {f.label}s</SelectItem>
+                        {f.options.map(opt => (
+                          <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ))}
 
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Graduation Year</label>
-                  <Input
-                    type="number"
-                    placeholder="e.g. 2022"
-                    value={filters.graduation_year}
-                    onChange={(e) => setFilters({ ...filters, graduation_year: e.target.value })}
-                    className="border-slate-200 focus-visible:ring-[#002147]"
-                  />
-                </div>
+                <Button 
+                  onClick={clearFilters}
+                  variant="ghost" 
+                  className="w-full text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 hover:text-red-600 rounded-xl h-10 mt-2"
+                >
+                  Clear Selection
+                </Button>
+              </div>
+            </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Skills</label>
-                  <Input
-                    placeholder="e.g. React, Python"
-                    value={filters.skills}
-                    onChange={(e) => setFilters({ ...filters, skills: e.target.value })}
-                    className="border-slate-200 focus-visible:ring-[#002147]"
-                  />
+            {/* Global clusters Mini-Widget */}
+            <div className="p-5 rounded-3xl bg-slate-50/30 border border-slate-100 space-y-4">
+               <div className="flex items-center gap-2 px-1">
+                  <Globe className="w-4 h-4 text-blue-500" />
+                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.1em]">Worldwide Pulse</span>
+               </div>
+               <div className="grid grid-cols-1 gap-2">
+                  {locationStats.map((loc, i) => (
+                    <div key={i} className="flex items-center justify-between p-2.5 bg-white rounded-xl border border-slate-50 shadow-sm">
+                      <span className="text-[11px] font-bold text-slate-700">{loc.name}</span>
+                      <span className="text-[10px] font-black text-slate-400">{loc.count}</span>
+                    </div>
+                  ))}
+               </div>
+            </div>
+          </aside>
+
+          {/* MAIN DATA STREAM */}
+          <div className="flex-1 space-y-10 min-w-0">
+            {/* STREAM HEADER */}
+            <div className="space-y-2">
+               <h2 className="text-3xl font-black text-[#002147] tracking-tighter">Alumni Stream</h2>
+               <p className="text-sm text-slate-400 font-medium tracking-tight">Real-time professional discovery across your verified community.</p>
+            </div>
+
+            <section>
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+              >
+                {[
+                  { label: "Active Mentors", value: heatmapStats.activeMentors, icon: Zap, color: "text-blue-500", bg: "bg-blue-50" },
+                  { label: "Top Domain", value: heatmapStats.topDomain, icon: Target, color: "text-purple-500", bg: "bg-purple-50" },
+                  { label: "Hot Skill", value: heatmapStats.topSkill, icon: Sparkles, color: "text-amber-500", bg: "bg-amber-50" },
+                  { label: "Open Refers", value: heatmapStats.openRefers, icon: Heart, color: "text-rose-500", bg: "bg-rose-50" }
+                ].map((stat, i) => (
+                  <div key={i} className="flex items-center gap-4 p-4 rounded-2xl border border-slate-100 bg-white shadow-sm hover:shadow-md transition-shadow">
+                    <div className={`w-10 h-10 ${stat.bg} ${stat.color} rounded-xl flex items-center justify-center`}>
+                      <stat.icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
+                      <p className="text-lg font-black text-slate-900">{stat.value}</p>
+                    </div>
+                  </div>
+                ))}
+              </motion.div>
+            </section>
+
+            {featuredAlumni.length > 0 && (
+              <section className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-amber-500" />
+                    <h3 className="text-xl font-black text-[#002147]">Priority Network</h3>
+                  </div>
+                </div>
+                <div className="flex gap-6 overflow-x-auto pb-6 -mx-2 px-2 no-scrollbar scroll-smooth">
+                  {featuredAlumni.map((alum) => (
+                    <motion.div key={`feat-${alum.user_id}`} whileHover={{ y: -5 }} className="flex-shrink-0 w-72">
+                      <Card 
+                        className="relative overflow-hidden border-none shadow-xl bg-gradient-to-br from-[#002147] to-[#003366] text-white p-6 h-44 flex flex-col justify-between cursor-pointer group rounded-[2rem]"
+                        onClick={() => navigate(`/profile/${alum.user_id}`)}
+                      >
+                        <div className="absolute -right-4 -top-4 w-32 h-32 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors" />
+                        <div className="flex items-start gap-4 z-10">
+                          <Avatar className="w-14 h-14 border-2 border-white/10">
+                            <AvatarImage src={alum.user?.picture} />
+                            <AvatarFallback className="bg-white/5 text-white">{getInitials(alum.user?.name)}</AvatarFallback>
+                          </Avatar>
+                          <div className="overflow-hidden">
+                            <p className="font-black truncate text-lg">{alum.user?.name}</p>
+                            <p className="text-xs text-white/50 truncate font-bold uppercase tracking-wider">{alum.company}</p>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center z-10">
+                          <span className="bg-amber-400 text-[#002147] text-[9px] font-black px-2 py-1 rounded-lg">HIGH RESPONDENT</span>
+                          <ArrowRight className="w-5 h-5 text-white/20 group-hover:text-white transition-colors" />
+                        </div>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            <section className="space-y-8 pt-6 border-t border-slate-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-[#002147] rounded-2xl flex items-center justify-center shadow-lg shadow-[#002147]/20">
+                    <Users className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-[#002147] text-xl tracking-tight">Verified Talents</h3>
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">{alumni.length} results indexed</p>
+                  </div>
                 </div>
               </div>
-            </CardContent>
-            <CardFooter className="bg-slate-50/50 border-t border-slate-100 flex justify-end py-4">
-              <Button
-                onClick={handleSearch}
-                className="bg-[#002147] hover:bg-[#003366] text-white rounded-lg px-8 transition-all hover:scale-[1.02] active:scale-[0.98]"
-              >
-                Apply Filters
-              </Button>
-            </CardFooter>
-          </Card>
-        </section>
 
-        {/* RESULTS GRID */}
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <SkeletonCard key={i} />
-            ))}
-          </div>
-        ) : alumni.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex flex-col items-center justify-center py-24 text-center border-2 border-dashed border-slate-100 rounded-3xl"
-          >
-            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-              <Users className="w-8 h-8 text-slate-300" />
-            </div>
-            <h3 className="text-xl font-bold text-slate-900 mb-2">No Alumni Found</h3>
-            <p className="text-slate-500 max-w-sm">
-              We couldn't find any alumni matching your current search criteria. Try adjusting your filters or clearing them to see all results.
-            </p>
-            <Button variant="link" onClick={clearFilters} className="mt-4 text-[#002147]">
-              Clear all filters
-            </Button>
-          </motion.div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <AnimatePresence mode="popLayout">
-              {alumni.map((alum, index) => (
-                <motion.div
-                  key={`${alum.user_id}-${index}`}
-                  layout
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
-                >
-                  <Card className="group relative h-full flex flex-col border-slate-200 hover:border-[#002147]/50 hover:shadow-xl hover:shadow-[#002147]/10 transition-all duration-300 bg-white overflow-hidden">
-                    {/* Feature 5: Multi-Action Dock (FABs) */}
-                    <div className="absolute right-3 top-20 flex flex-col gap-2 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-300 z-20">
-                      {[
-                        { icon: Bookmark, color: "bg-white text-slate-400 hover:text-blue-500", label: "Save", type: 'save' },
-                        { icon: Heart, color: "bg-white text-slate-400 hover:text-rose-500", label: "Kudos", type: 'kudos' },
-                        { icon: Send, color: "bg-[#002147] text-white hover:bg-[#003366]", label: "Referral", type: 'referral' }
-                      ].map((action, i) => (
-                        <button 
-                          key={i}
-                          onClick={(e) => handleAction(e, action.type, alum.user?.name)}
-                          className={`w-9 h-9 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95 ${action.color}`}
-                          title={action.label}
-                        >
-                          <action.icon className="w-4 h-4" />
-                        </button>
-                      ))}
-                    </div>
-                    <CardHeader className="flex flex-row items-center gap-4 space-y-0 pb-6">
-                      <div className="relative">
-                        <Avatar className={`w-14 h-14 border-2 transition-all duration-300 ${alum.is_live ? 'border-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.5)]' : currentUserProfile?.department === alum.department ? 'border-rose-400 shadow-[0_0_10px_rgba(244,63,94,0.3)]' : 'border-slate-50'}`}>
-                          <AvatarImage src={alum.user?.picture} />
-                          <AvatarFallback className="bg-[#002147]/5 text-[#002147] font-bold text-lg">
-                            {getInitials(alum.user?.name)}
-                          </AvatarFallback>
-                        </Avatar>
-                        {alum.is_live && (
-                          <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-blue-500 border-2 border-white rounded-full flex items-center justify-center">
-                            <span className="absolute inset-0 rounded-full bg-blue-500 animate-ping opacity-75"></span>
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex-1 overflow-hidden">
-                        <CardTitle className="text-xl font-bold text-[#002147] truncate group-hover:text-[#002147]/80 transition-colors flex flex-wrap items-center gap-2">
-                          {alum.user?.name}
-                          <div className="flex gap-1.5">
-                            {alum.is_live && (
-                              <motion.div 
-                                initial={{ scale: 0.9 }}
-                                animate={{ scale: 1 }}
-                                transition={{ repeat: Infinity, duration: 2, repeatType: "reverse" }}
-                                className="bg-gradient-to-r from-blue-600 to-blue-400 text-white text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm"
-                              >
-                                <div className="w-1 h-1 bg-white rounded-full animate-pulse" />
-                                LIVE
-                              </motion.div>
-                            )}
-                            {/* Feature 2: The Bridge (Department Match) */}
-                            {currentUserProfile?.department === alum.department && (
-                              <motion.div 
-                                whileHover={{ scale: 1.05 }}
-                                className="bg-gradient-to-r from-rose-500 to-orange-400 text-white text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm"
-                              >
-                                <Heart className="w-2 h-2 fill-white" />
-                                MATCH
-                              </motion.div>
-                            )}
-                          </div>
-                        </CardTitle>
-                        <CardDescription className="flex items-center gap-1 text-slate-500">
-                          <GraduationCap className="w-3.5 h-3.5" />
-                          Class of {alum.graduation_year}
-                        </CardDescription>
-                      </div>
-                    </CardHeader>
-
-                    <CardContent className="flex-1 space-y-4">
-                      {/* Feature 3: Wisdom Snippet */}
-                      {alum.latest_wisdom ? (
-                        <div className="relative p-3 rounded-xl bg-slate-50 border border-slate-100 group-hover:bg-[#002147]/5 transition-colors">
-                          <MessageSquareQuote className="absolute -top-2 -left-2 w-5 h-5 text-[#002147]/20" />
-                          <p className="text-xs italic text-slate-600 leading-relaxed line-clamp-2">
-                            "{alum.latest_wisdom}"
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="space-y-2.5">
-                          {alum.job_domain && (
-                            <div className="flex items-center gap-2.5 text-slate-600 text-sm">
-                              <Briefcase className="w-4 h-4 text-slate-400" />
-                              <span className="font-medium">{alum.job_domain}</span>
-                            </div>
-                          )}
-                          {alum.company && (
-                            <div className="flex items-center gap-2.5 text-slate-600 text-sm">
-                              <div className="w-4 h-4 flex items-center justify-center text-slate-400 font-bold text-xs">@</div>
-                              <span>{alum.company}</span>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Skills */}
-                      {alum.skills && (
-                        <div className="flex flex-wrap gap-1.5 pt-1">
-                          {(Array.isArray(alum.skills)
-                            ? alum.skills
-                            : alum.skills.split(",")
-                          ).slice(0, 3).map((skill, sIdx) => (
-                            <Badge
-                              key={sIdx}
-                              variant="secondary"
-                              className="bg-slate-100/50 text-slate-500 text-[9px] font-medium"
-                            >
-                              {typeof skill === "string" ? skill.trim() : skill}
-                            </Badge>
-                          ))}
-                          {alum.skills.length > 3 && (
-                            <span className="text-[9px] text-slate-400">+{alum.skills.length - 3} move</span>
-                          )}
-                        </div>
-                      )}
-                    </CardContent>
-
-                    <CardFooter className="pt-2">
-                      <Button
-                        onClick={() => navigate(`/profile/${alum.user_id}`)}
-                        className="w-full bg-white border border-[#002147] text-[#002147] hover:bg-[#002147] hover:text-white rounded-xl font-semibold transition-all group-hover:shadow-md"
+              {loading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[1, 2, 3, 4, 5, 6].map((i) => <SkeletonCard key={i} />)}
+                </div>
+              ) : alumni.length === 0 ? (
+                <div className="py-20 text-center bg-slate-50/50 rounded-[3rem] border-2 border-dashed border-slate-100">
+                  <h3 className="font-black text-slate-400">No Pioneers Found</h3>
+                  <Button variant="link" onClick={clearFilters} className="mt-4 text-[#002147]">Reset Parameters</Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <AnimatePresence mode="popLayout">
+                    {alumni.map((alum, index) => (
+                      <motion.div
+                        key={`${alum.user_id}-${index}`}
+                        layout
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.4, delay: index * 0.05 }}
                       >
-                        View Profile
-                        <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                </motion.div>
-              ))}
-            </AnimatePresence>
+                        <Card className="group h-full flex flex-col border-slate-100/60 transition-all duration-500 hover:shadow-2xl hover:shadow-[#002147]/5 rounded-[2.5rem] overflow-hidden bg-white hover:-translate-y-1 relative">
+                          <div className="absolute right-4 top-20 flex flex-col gap-2.5 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-300 z-20">
+                            {[
+                              { icon: Bookmark, color: "bg-white text-slate-400 hover:text-blue-500", type: 'save' },
+                              { icon: Heart, color: "bg-white text-slate-400 hover:text-rose-500", type: 'kudos' },
+                              { icon: Send, color: "bg-[#002147] text-white", type: 'referral' }
+                            ].map((a, i) => (
+                              <button key={i} onClick={(e) => handleAction(e, a.type, alum.user?.name)} className={`w-10 h-10 rounded-2xl shadow-xl border border-slate-50 flex items-center justify-center transition-all hover:scale-110 ${a.color}`}>
+                                <a.icon className="w-4 h-4" />
+                              </button>
+                            ))}
+                          </div>
+
+                          <CardHeader className="p-8 pb-4 flex flex-row items-center gap-5">
+                            <div className="relative">
+                              <Avatar className={`w-16 h-16 border-2 transition-all duration-500 ${alum.is_live ? 'border-blue-500 shadow-xl shadow-blue-500/20' : 'border-slate-50'}`}>
+                                <AvatarImage src={alum.user?.picture} />
+                                <AvatarFallback className="bg-slate-50 text-[#002147] font-black">{getInitials(alum.user?.name)}</AvatarFallback>
+                              </Avatar>
+                              {alum.is_live && <span className="absolute bottom-1 right-1 w-4 h-4 bg-blue-500 border-2 border-white rounded-full animate-pulse" />}
+                            </div>
+                            <div className="min-w-0">
+                               <CardTitle className="text-xl font-black text-[#002147] truncate">{alum.user?.name}</CardTitle>
+                               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Class of {alum.graduation_year}</p>
+                            </div>
+                          </CardHeader>
+
+                          <CardContent className="p-8 pt-4 flex-1">
+                            {alum.latest_wisdom ? (
+                               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 italic text-xs text-slate-600 line-clamp-3">"{alum.latest_wisdom}"</div>
+                            ) : (
+                               <div className="space-y-4">
+                                  <div className="flex items-center gap-3">
+                                     <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400"><Briefcase className="w-4 h-4" /></div>
+                                     <span className="text-xs font-black text-slate-600 uppercase tracking-wider">{alum.job_domain || "Industry Pioneer"}</span>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                     <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400"><Building2 className="w-4 h-4" /></div>
+                                     <span className="text-xs font-bold text-slate-500">{alum.company || "Stealth Startup"}</span>
+                                  </div>
+                               </div>
+                            )}
+                          </CardContent>
+
+                          <CardFooter className="p-8 pt-0">
+                             <Button onClick={() => navigate(`/profile/${alum.user_id}`)} className="w-full bg-[#002147] hover:bg-[#003366] text-white rounded-2xl h-12 font-black shadow-lg shadow-[#002147]/20 group-hover:scale-[1.02] transition-all">
+                                Access Profile <ChevronRight className="w-4 h-4 ml-1" />
+                             </Button>
+                          </CardFooter>
+                        </Card>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              )}
+            </section>
           </div>
-        )}
+        </div>
       </main>
 
-      {/* FOOTER */}
-      <footer className="bg-white border-t border-slate-200 py-8 mt-auto">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-slate-400 text-sm">
-            © 2026 AlumConnect. All rights reserved.
-          </p>
-          <div className="flex gap-6">
-            <a href="#" className="text-slate-400 hover:text-[#002147] text-sm transition-colors">Privacy</a>
-            <a href="#" className="text-slate-400 hover:text-[#002147] text-sm transition-colors">Terms</a>
-            <a href="#" className="text-slate-400 hover:text-[#002147] text-sm transition-colors">Help</a>
+      <footer className="w-full border-t border-slate-100 py-12 bg-white mt-auto">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="flex flex-col items-center md:items-start gap-2">
+            <h4 className="font-black text-[#002147]">AlumConnect</h4>
+            <p className="text-slate-400 text-xs font-medium">© 2026 Professional Network Pulse. Verified & Secured.</p>
+          </div>
+          <div className="flex gap-8">
+            {['Privacy', 'Legal', 'Support'].map((l, i) => (
+              <a key={i} href="#" className="text-slate-400 hover:text-[#002147] text-[10px] font-black uppercase tracking-widest">{l}</a>
+            ))}
           </div>
         </div>
       </footer>
@@ -695,4 +565,3 @@ const AlumniDirectory = () => {
 };
 
 export default AlumniDirectory;
-
