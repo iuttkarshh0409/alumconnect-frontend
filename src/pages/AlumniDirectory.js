@@ -48,6 +48,8 @@ import {
   LayoutGrid,
   Activity,
   ShieldCheck,
+  Trophy,
+  BarChart3,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -286,22 +288,59 @@ const AlumniDirectory = () => {
         <div className="flex flex-col lg:flex-row gap-10 items-start">
           {/* SIDEBAR COMMAND CENTER */}
           <aside className="lg:w-80 w-full space-y-6 lg:sticky lg:top-24">
-            {/* Professional Summary Context */}
+            {/* Network Power Index (NPI) Console */}
             {currentUserProfile && (
-              <div className="p-6 rounded-3xl bg-gradient-to-br from-[#002147] to-[#003366] text-white shadow-xl relative overflow-hidden group">
-                <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-700" />
-                <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-4">Verification Status</p>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/10 shadow-inner">
-                    <ShieldCheck className="w-5 h-5 text-amber-400" />
+              <div className="p-6 rounded-[2.5rem] bg-gradient-to-br from-[#002147] to-[#003366] text-white shadow-2xl relative overflow-hidden group border border-white/5">
+                {/* Background Radar Effect */}
+                <div className="absolute -right-10 -top-10 w-40 h-40 bg-blue-400/10 rounded-full blur-[60px] group-hover:bg-blue-400/20 transition-all duration-1000" />
+                
+                <div className="relative z-10 space-y-5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                       <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                       <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Network Power Index</span>
+                    </div>
+                    <div className="px-2 py-0.5 rounded-md bg-white/10 border border-white/10 text-[8px] font-black text-white/60">LVL 84</div>
                   </div>
-                  <div>
-                    <h4 className="font-bold text-sm leading-tight">{currentUserProfile.user?.name}</h4>
-                    <p className="text-[10px] text-white/50">{currentUserProfile.department}</p>
+
+                  <div className="flex items-end gap-3">
+                    <h4 className="text-4xl font-black tracking-tighter text-white">742</h4>
+                    <div className="mb-1.5 flex flex-col">
+                       <span className="text-[10px] font-black text-amber-400 flex items-center gap-0.5">
+                         <TrendingUp className="w-2.5 h-2.5" /> +12%
+                       </span>
+                       <span className="text-[8px] font-bold text-white/30 uppercase tracking-widest text-[7px]">Gravitas Score</span>
+                    </div>
                   </div>
-                </div>
-                <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
-                  <motion.div initial={{ width: 0 }} animate={{ width: "75%" }} className="h-full bg-amber-400" />
+
+                  {/* Tactical Progress Units */}
+                  <div className="space-y-3 pt-2">
+                    {[
+                      { label: "Profile Sync", value: "92%", color: "bg-amber-400" },
+                      { label: "Network Reach", value: "64%", color: "bg-blue-400" },
+                      { label: "Influence Hub", value: "48%", color: "bg-rose-400" }
+                    ].map((stat, i) => (
+                      <div key={i} className="space-y-1.5">
+                        <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-wider text-white/50">
+                          <span>{stat.label}</span>
+                          <span className="text-white/80">{stat.value}</span>
+                        </div>
+                        <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                          <motion.div 
+                            initial={{ width: 0 }} 
+                            animate={{ width: stat.value }} 
+                            transition={{ duration: 1, delay: i * 0.2 }}
+                            className={`h-full ${stat.color} shadow-[0_0_8px_rgba(255,255,255,0.2)]`} 
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="pt-2 flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Tactical Recon Active</span>
+                  </div>
                 </div>
               </div>
             )}
