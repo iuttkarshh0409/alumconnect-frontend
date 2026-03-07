@@ -216,6 +216,22 @@ const AlumniDashboard = () => {
     }
   };
 
+  const handleInitiateScout = () => {
+    toast.promise(fetchAllData(), {
+      loading: 'Synthesizing campus data...',
+      success: 'Radar synced with latest student profiles!',
+      error: 'Radar sync failed. Check connection.',
+    });
+  };
+
+  const handleRadarSettings = () => {
+    document.getElementById('profile-card')?.scrollIntoView({ behavior: 'smooth' });
+    setEditMode(true);
+    toast.info("Radar matches are tuned by your Profile & Expertise settings.", {
+      icon: "⚙️"
+    });
+  };
+
   const handleUpdateProfile = async () => {
     try {
       const token = await getToken();
@@ -566,7 +582,7 @@ const AlumniDashboard = () => {
               transition={{ duration: 0.6 }}
               className="sticky top-28"
             >
-              <Card className="border-none bg-white dark:bg-[#001529] shadow-2xl shadow-slate-200 dark:shadow-black/60 overflow-hidden transition-all duration-500 rounded-[3rem] border border-white/5">
+              <Card id="profile-card" className="border-none bg-white dark:bg-[#001529] shadow-2xl shadow-slate-200 dark:shadow-black/60 overflow-hidden transition-all duration-500 rounded-[3rem] border border-white/5">
                 {/* Profile Header Background Mesh */}
                 <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-br from-[#002147] to-[#0a3d62] opacity-10 dark:opacity-40" />
                 
@@ -767,8 +783,19 @@ const AlumniDashboard = () => {
                      Our AI scan has identified <span className="text-white font-bold">{radarStudents?.length || 0} high-potential students</span> from your department matching your tech domain.
                   </p>
                   <div className="flex gap-4 justify-center xl:justify-start">
-                     <Button className="bg-blue-600 hover:bg-blue-500 text-white rounded-full px-6 font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-500/20 transition-all active:scale-95">Initiate Scout</Button>
-                     <Button variant="outline" className="border-white/10 text-white/60 hover:text-white rounded-full px-6 font-black text-[10px] uppercase tracking-widest bg-transparent">Settings</Button>
+                     <Button 
+                      onClick={handleInitiateScout}
+                      className="bg-blue-600 hover:bg-blue-500 text-white rounded-full px-6 font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-500/20 transition-all active:scale-95"
+                     >
+                      Initiate Scout
+                     </Button>
+                     <Button 
+                      onClick={handleRadarSettings}
+                      variant="outline" 
+                      className="border-white/10 text-white/60 hover:text-white rounded-full px-6 font-black text-[10px] uppercase tracking-widest bg-transparent"
+                     >
+                      Settings
+                     </Button>
                   </div>
                 </div>
 
