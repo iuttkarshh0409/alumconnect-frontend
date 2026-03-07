@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
 import axios from "axios";
@@ -35,6 +35,7 @@ import {
   CalendarDays,
   Target,
   Search,
+  Camera,
 } from "lucide-react";
 import {
   Dialog,
@@ -61,6 +62,7 @@ const AlumniDashboard = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const { getToken, isLoaded, isSignedIn, signOut } = useAuth();
+  const fileInputRef = useRef(null);
 
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -79,29 +81,40 @@ const AlumniDashboard = () => {
   const [availability, setAvailability] = useState([true, true, false, true, false, true, true]); // 7 days (S, M, T, W, T, F, S)
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-  const handleSyncLinkedIn = async () => {
-    setIsSyncing(true);
-    try {
-      const token = await getToken();
-      const response = await axios.post(
-        `${API_URL}/api/alumni/sync-linkedin-photo`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+  const handlePhotoUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
 
-      if (response.data.status === "success") {
-        const updatedPicture = `${response.data.picture}?t=${Date.now()}`;
-        setUser({ ...user, picture: updatedPicture });
-        toast.success("Profile photo synced with LinkedIn!");
-      } else {
-        toast.info(response.data.message || "No new photo found on LinkedIn.");
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to sync LinkedIn photo");
-    } finally {
-      setIsSyncing(false);
+    // Check file size (limit to 1MB for base64 storage in this prototype)
+    if (file.size > 1024 * 1024) {
+      toast.error("File is too large! Please choose an image under 1MB.");
+      return;
     }
+
+    setIsSyncing(true);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      try {
+        const base64Image = reader.result;
+        const token = await getToken();
+        const response = await axios.post(
+          `${API_URL}/api/alumni/update-photo`,
+          { picture: base64Image },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (response.data.status === "success") {
+          setUser({ ...user, picture: response.data.picture });
+          toast.success("Profile photo updated!");
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to update photo");
+      } finally {
+        setIsSyncing(false);
+      }
+    };
   };
 
   const fetchAllData = useCallback(async () => {
@@ -543,13 +556,21 @@ const AlumniDashboard = () => {
                         </div>
                       </div>
 
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handlePhotoUpload}
+                        accept="image/*"
+                        className="hidden"
+                      />
+
                       <button
-                        onClick={handleSyncLinkedIn}
+                        onClick={() => fileInputRef.current?.click()}
                         disabled={isSyncing}
-                        className="absolute -top-3 -right-3 bg-white dark:bg-slate-800 p-2.5 rounded-2xl shadow-xl text-slate-400 hover:text-[#0077B5] transition-all hover:scale-110 active:scale-90 border border-slate-100 dark:border-white/5"
-                        title="Sync LinkedIn Photo"
+                        className="absolute -top-3 -right-3 bg-white dark:bg-slate-800 p-2.5 rounded-2xl shadow-xl text-slate-400 hover:text-blue-500 transition-all hover:scale-110 active:scale-90 border border-slate-100 dark:border-white/5 group"
+                        title="Upload Profile Photo"
                       >
-                        <RefreshCw className={`w-4 h-4 ${isSyncing ? "animate-spin text-[#0077B5]" : ""}`} />
+                        <Camera className={`w-4 h-4 ${isSyncing ? "animate-pulse text-blue-500" : "group-hover:rotate-12 transition-transform"}`} />
                       </button>
                     </div>
 
