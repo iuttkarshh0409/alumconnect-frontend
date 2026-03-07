@@ -50,6 +50,10 @@ import {
   ShieldCheck,
   Trophy,
   BarChart3,
+  Compass,
+  Cpu,
+  Handshake,
+  Command,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -437,10 +441,10 @@ const AlumniDirectory = () => {
                 className="grid grid-cols-2 lg:grid-cols-4 gap-4"
               >
                 {[
-                  { label: "Active Mentors", value: heatmapStats.activeMentors, icon: Zap, color: "text-blue-500", bg: "bg-blue-50" },
-                  { label: "Top Domain", value: heatmapStats.topDomain, icon: Target, color: "text-purple-500", bg: "bg-purple-50" },
-                  { label: "Hot Skill", value: heatmapStats.topSkill, icon: Sparkles, color: "text-amber-500", bg: "bg-amber-50" },
-                  { label: "Open Refers", value: heatmapStats.openRefers, icon: Heart, color: "text-rose-500", bg: "bg-rose-50" }
+                  { label: "Active Mentors", value: heatmapStats.activeMentors, icon: Activity, color: "text-blue-600", bg: "bg-blue-50/50" },
+                  { label: "Top Domain", value: heatmapStats.topDomain, icon: Compass, color: "text-indigo-600", bg: "bg-indigo-50/50" },
+                  { label: "Hot Skill", value: heatmapStats.topSkill, icon: Cpu, color: "text-emerald-600", bg: "bg-emerald-50/50" },
+                  { label: "Open Refers", value: heatmapStats.openRefers, icon: Handshake, color: "text-amber-600", bg: "bg-amber-50/50" }
                 ].map((stat, i) => (
                   <div key={i} className="flex items-center gap-4 p-4 rounded-2xl border border-slate-100 bg-white shadow-sm hover:shadow-md transition-shadow">
                     <div className={`w-10 h-10 ${stat.bg} ${stat.color} rounded-xl flex items-center justify-center`}>
