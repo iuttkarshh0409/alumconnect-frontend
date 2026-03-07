@@ -164,6 +164,35 @@ const AlumniDirectory = () => {
     }
   };
 
+  const handleAction = (e, type, alumName) => {
+    e.stopPropagation(); // Don't trigger the card's profile navigation
+    
+    switch(type) {
+      case 'save':
+        toast.success(`Bookmarked ${alumName.split(' ')[0]} to your network`, {
+          icon: <Bookmark className="w-4 h-4 text-blue-500" />
+        });
+        break;
+      case 'kudos':
+        toast(`Sent Kudos to ${alumName.split(' ')[0]}! ✨`, {
+          icon: <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
+        });
+        break;
+      case 'referral':
+        toast.promise(
+          new Promise(resolve => setTimeout(resolve, 1500)),
+          {
+            loading: `Drafting referral inquiry for ${alumName}...`,
+            success: `Referral inquiry sent to ${alumName}! 🚀`,
+            error: 'Failed to initiate request.',
+          }
+        );
+        break;
+      default:
+        break;
+    }
+  };
+
   const getInitials = (name) => {
     if (!name) return "??";
     return name
@@ -465,12 +494,13 @@ const AlumniDirectory = () => {
                     {/* Feature 5: Multi-Action Dock (FABs) */}
                     <div className="absolute right-3 top-20 flex flex-col gap-2 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-300 z-20">
                       {[
-                        { icon: Bookmark, color: "bg-white text-slate-400 hover:text-blue-500", label: "Save" },
-                        { icon: Heart, color: "bg-white text-slate-400 hover:text-rose-500", label: "Kudos" },
-                        { icon: Send, color: "bg-[#002147] text-white hover:bg-[#003366]", label: "Referral" }
+                        { icon: Bookmark, color: "bg-white text-slate-400 hover:text-blue-500", label: "Save", type: 'save' },
+                        { icon: Heart, color: "bg-white text-slate-400 hover:text-rose-500", label: "Kudos", type: 'kudos' },
+                        { icon: Send, color: "bg-[#002147] text-white hover:bg-[#003366]", label: "Referral", type: 'referral' }
                       ].map((action, i) => (
                         <button 
                           key={i}
+                          onClick={(e) => handleAction(e, action.type, alum.user?.name)}
                           className={`w-9 h-9 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95 ${action.color}`}
                           title={action.label}
                         >
