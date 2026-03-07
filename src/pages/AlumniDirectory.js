@@ -33,6 +33,7 @@ import {
   ChevronRight,
   X,
   Buildings,
+  Zap,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -340,8 +341,19 @@ const AlumniDirectory = () => {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 overflow-hidden">
-                        <CardTitle className="text-xl font-bold text-[#002147] truncate group-hover:text-[#002147]/80 transition-colors">
+                        <CardTitle className="text-xl font-bold text-[#002147] truncate group-hover:text-[#002147]/80 transition-colors flex items-center gap-2">
                           {alum.user?.name}
+                          {alum.is_live && (
+                            <motion.div
+                              initial={{ scale: 0.8 }}
+                              animate={{ scale: 1 }}
+                              repeat={Infinity}
+                              className="bg-blue-500 text-white text-[8px] px-1.5 py-0.5 rounded-md flex items-center gap-0.5 animate-pulse"
+                            >
+                              <Zap className="w-2 h-2 fill-white" />
+                              LIVE
+                            </motion.div>
+                          )}
                         </CardTitle>
                         <CardDescription className="flex items-center gap-1 text-slate-500">
                           <GraduationCap className="w-3.5 h-3.5" />

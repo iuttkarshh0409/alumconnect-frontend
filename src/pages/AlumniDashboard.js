@@ -74,6 +74,13 @@ const AlumniDashboard = () => {
   
   // New Expert Bomb States
   const [isOpenToRefer, setIsOpenToRefer] = useState(false);
+  const [isLiveNow, setIsLiveNow] = useState(false);
+  const [alumniStats, setAlumniStats] = useState({
+    total_high_fives: 0,
+    accepted_sessions: 0,
+    pending_requests: 0,
+    is_live: false
+  });
   const [wisdomText, setWisdomText] = useState("");
   const [isPostingWisdom, setIsPostingWisdom] = useState(false);
   
@@ -147,17 +154,14 @@ const AlumniDashboard = () => {
         linkedin_url: pData.linkedin_url || "",
       });
 
-      const requestsResponse = await axios.get(`${API_URL}/api/mentorship/requests`, {
+      setRequests(enrichedRequests);
+
+      // Fetch personal stats
+      const statsResponse = await axios.get(`${API_URL}/api/alumni/stats/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      // Inject logic for Feature 4: Priority Sorting (Mocked based on description/topic)
-      const enrichedRequests = requestsResponse.data.map(req => ({
-        ...req,
-        isPriority: req.topic.toLowerCase().includes('interview') || req.description.toLowerCase().includes('faang') || req.description.length > 100
-      }));
-
-      setRequests(enrichedRequests);
+      setAlumniStats(statsResponse.data);
+      setIsLiveNow(statsResponse.data.is_live);
     } catch (error) {
       console.error(error);
       toast.error("Failed to load dashboard data");
@@ -220,6 +224,21 @@ const AlumniDashboard = () => {
       }
     } catch {
       toast.error("Failed to update profile");
+    }
+  };
+
+  const handleToggleLive = async () => {
+    try {
+      const token = await getToken();
+      const response = await axios.post(
+        `${API_URL}/api/alumni/toggle-live`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setIsLiveNow(response.data.is_live);
+      toast.success(response.data.is_live ? "You are now LIVE!" : "Live session ended");
+    } catch (error) {
+      toast.error("Failed to toggle live status");
     }
   };
 
@@ -287,8 +306,8 @@ const AlumniDashboard = () => {
   const acceptedRequests = requests.filter(r => r.status === 'accepted').length;
 
   // Influence Meter Logic
-  const IMPACT_LEVEL_GOAL = 10;
-  const currentImpactCount = acceptedRequests * 2 + pendingRequests; 
+  const IMPACT_LEVEL_GOAL = 50;
+  const currentImpactCount = (alumniStats.accepted_sessions * 5) + (alumniStats.total_high_fives * 2) + alumniStats.pending_requests; 
   const impactProgress = Math.min((currentImpactCount / IMPACT_LEVEL_GOAL) * 100, 100);
 
   return (
@@ -489,10 +508,10 @@ const AlumniDashboard = () => {
                     <div className="flex justify-between items-end">
                        <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <span className="text-5xl font-black tracking-tighter">{currentImpactCount}k</span>
-                            <Badge className="bg-green-500/20 text-green-400 border-none text-[8px] font-black">+12%</Badge>
+                            <span className="text-5xl font-black tracking-tighter">{currentImpactCount}</span>
+                            <Badge className="bg-green-500/20 text-green-400 border-none text-[8px] font-black">+{alumniStats.total_high_fives} High-Fives</Badge>
                           </div>
-                          <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Total Influence Points</p>
+                          <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Total Influence Score</p>
                        </div>
                     </div>
                     
@@ -506,7 +525,7 @@ const AlumniDashboard = () => {
                       </div>
                       <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-white/30">
                          <span>Expert</span>
-                         <span className="text-white/60">{100 - impactProgress}% to Level 5</span>
+                         <span className="text-white/60">{IMPACT_LEVEL_GOAL - currentImpactCount} till next level</span>
                          <span>Legend</span>
                       </div>
                     </div>
@@ -590,23 +609,44 @@ const AlumniDashboard = () => {
                       </div>
                     </div>
 
-                    {/* Improvised Open to Refer Toggle */}
-                    <div className={`w-full p-1 rounded-[1.8rem] transition-all duration-500 ${isOpenToRefer ? 'bg-green-500/10' : 'bg-slate-50 dark:bg-white/5'}`}>
-                      <div className="flex items-center justify-between p-4 bg-white dark:bg-slate-900/50 rounded-[1.5rem] shadow-sm border border-slate-100 dark:border-white/5">
-                        <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-xl transition-colors ${isOpenToRefer ? 'bg-green-500/20 text-green-500' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
-                            <Flame className={`w-4 h-4 ${isOpenToRefer ? 'animate-pulse' : ''}`} />
+                    {/* Improvised Live Now / Open to Refer Toggles */}
+                    <div className="w-full space-y-3">
+                      <div className={`p-1 rounded-[1.8rem] transition-all duration-500 ${isLiveNow ? 'bg-blue-500/10' : 'bg-slate-50 dark:bg-white/5'}`}>
+                        <div className="flex items-center justify-between p-4 bg-white dark:bg-slate-900/50 rounded-[1.5rem] shadow-sm border border-slate-100 dark:border-white/5">
+                          <div className="flex items-center gap-3">
+                            <div className={`p-2 rounded-xl transition-colors ${isLiveNow ? 'bg-blue-500/20 text-blue-500' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
+                              <Zap className={`w-4 h-4 ${isLiveNow ? 'animate-pulse' : ''}`} />
+                            </div>
+                            <div className="text-left">
+                               <p className={`text-[9px] font-black uppercase tracking-widest ${isLiveNow ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500'}`}>Mentorship Live</p>
+                               <p className="text-[10px] font-bold text-slate-400 tracking-tighter">Status: {isLiveNow ? "ACTIVE" : "OFFAIR"}</p>
+                            </div>
                           </div>
-                          <div className="text-left">
-                             <p className={`text-[9px] font-black uppercase tracking-widest ${isOpenToRefer ? 'text-green-600 dark:text-green-400' : 'text-slate-500'}`}>Hiring Referral</p>
-                             <p className="text-[10px] font-bold text-slate-400 tracking-tighter italic">Currently at {profile?.company}</p>
-                          </div>
+                          <Switch 
+                            checked={isLiveNow} 
+                            onCheckedChange={handleToggleLive} 
+                            className="data-[state=checked]:bg-blue-500"
+                          />
                         </div>
-                        <Switch 
-                          checked={isOpenToRefer} 
-                          onCheckedChange={handleToggleRefer} 
-                          className="data-[state=checked]:bg-green-500"
-                        />
+                      </div>
+
+                      <div className={`p-1 rounded-[1.8rem] transition-all duration-500 ${isOpenToRefer ? 'bg-green-500/10' : 'bg-slate-50 dark:bg-white/5'}`}>
+                        <div className="flex items-center justify-between p-4 bg-white dark:bg-slate-900/50 rounded-[1.5rem] shadow-sm border border-slate-100 dark:border-white/5">
+                          <div className="flex items-center gap-3">
+                            <div className={`p-2 rounded-xl transition-colors ${isOpenToRefer ? 'bg-green-500/20 text-green-500' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
+                              <Flame className={`w-4 h-4 ${isOpenToRefer ? 'animate-pulse' : ''}`} />
+                            </div>
+                            <div className="text-left">
+                               <p className={`text-[9px] font-black uppercase tracking-widest ${isOpenToRefer ? 'text-green-600 dark:text-green-400' : 'text-slate-500'}`}>Hiring Referral</p>
+                               <p className="text-[10px] font-bold text-slate-400 tracking-tighter">Accepting resumes</p>
+                            </div>
+                          </div>
+                          <Switch 
+                            checked={isOpenToRefer} 
+                            onCheckedChange={handleToggleRefer} 
+                            className="data-[state=checked]:bg-green-500"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -27,6 +27,7 @@ import {
   Award,
   Quote,
   Flame,
+  Hand,
 } from "lucide-react";
 import {
   Card,
@@ -101,13 +102,8 @@ const StudentDashboard = () => {
       const wisdomRes = await axios.get(`${API_URL}/api/student/wisdom`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (wisdomRes.data && wisdomRes.data.length > 0) {
-        // Map backend response to frontend format
-        const formattedTips = wisdomRes.data.map(t => ({
-          text: t.text,
-          author: `${t.author_name} (Expert Alum)`
-        }));
-        setProTips([...formattedTips, ...PRO_TIPS]);
+      if (wisdomRes.data) {
+        setProTips(wisdomRes.data);
       }
 
     } catch (error) {
@@ -122,6 +118,23 @@ const StudentDashboard = () => {
     if (!isLoaded || !isSignedIn) return;
     fetchData();
   }, [isLoaded, isSignedIn, fetchData]);
+
+  const handleHighFive = async (tipId) => {
+    try {
+      const token = await getToken();
+      await axios.post(`${API_URL}/api/wisdom/${tipId}/high-five`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      // Refresh wisdom tips
+      const wisdomRes = await axios.get(`${API_URL}/api/student/wisdom`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProTips(wisdomRes.data);
+      toast.success("High-five sent!");
+    } catch (error) {
+      toast.error("Action failed");
+    }
+  };
 
   // Tip Slider Logic
   useEffect(() => {
@@ -233,7 +246,18 @@ const StudentDashboard = () => {
                     <p className="text-lg font-bold text-[#002147] dark:text-slate-200 leading-tight mb-4 tracking-tight italic">
                       "{proTips[tipIndex]?.text}"
                     </p>
-                    <p className="text-[10px] font-black uppercase tracking-tighter text-slate-400">— {proTips[tipIndex]?.author}</p>
+                    <div className="flex items-center justify-between">
+                       <p className="text-[10px] font-black uppercase tracking-tighter text-slate-400">— {proTips[tipIndex]?.author_name || proTips[tipIndex]?.author}</p>
+                       {proTips[tipIndex]?.tip_id && (
+                         <button 
+                          onClick={() => handleHighFive(proTips[tipIndex]?.tip_id)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all ${proTips[tipIndex]?.has_applauded ? 'bg-orange-500 text-white shadow-lg' : 'bg-white dark:bg-slate-800 text-slate-400 hover:bg-orange-50 hover:text-orange-500 shadow-sm'}`}
+                         >
+                            <Hand className={`w-3.5 h-3.5 ${proTips[tipIndex]?.has_applauded ? 'fill-white' : ''}`} />
+                            <span className="text-[10px] font-black">{proTips[tipIndex]?.applauds_count || 0}</span>
+                         </button>
+                       )}
+                    </div>
                   </motion.div>
                 </AnimatePresence>
               </div>
