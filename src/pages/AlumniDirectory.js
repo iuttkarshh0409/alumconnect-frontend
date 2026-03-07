@@ -43,6 +43,8 @@ import {
   Target,
   MessageSquareQuote,
   ArrowRight,
+  Globe,
+  MapPin,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -70,6 +72,9 @@ const AlumniDirectory = () => {
     openRefers: 0
   });
 
+  const [currentUserProfile, setCurrentUserProfile] = useState(null);
+  const [locationStats, setLocationStats] = useState([]);
+
   const fetchAlumni = useCallback(async () => {
     if (!isLoaded || !isSignedIn) return;
 
@@ -96,6 +101,26 @@ const AlumniDirectory = () => {
       );
 
       setAlumni(response.data);
+
+      // Feature 3: Calculate Global Footprint (Location Stats)
+      const locations = response.data.map(a => a.city || a.country).filter(Boolean);
+      const locCounts = locations.reduce((acc, loc) => {
+        acc[loc] = (acc[loc] || 0) + 1;
+        return acc;
+      }, {});
+      const sortedLocs = Object.entries(locCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([name, count]) => ({ name, count }));
+      setLocationStats(sortedLocs);
+
+      // Feature 2: Fetch Current User Profile once to enable "The Bridge" matching
+      if (!currentUserProfile) {
+        const profileRes = await axios.get(`${API_URL}/api/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setCurrentUserProfile(profileRes.data);
+      }
 
       // Feature 2: Calculate Heatmap Stats
       const stats = response.data.reduce((acc, alum) => {
@@ -271,11 +296,33 @@ const AlumniDirectory = () => {
             transition={{ duration: 0.5 }}
           >
             <h2 className="font-serif text-5xl font-extrabold text-[#002147] mb-4 tracking-tight">
-              Alumni Directory
+              Connect with the Pioneers
             </h2>
             <p className="text-xl text-slate-500 max-w-2xl font-light leading-relaxed">
               Explore your professional network. Connect with mentors, peers, and industry leaders from our verified alumni community.
             </p>
+
+            {/* Feature 3: Global Footprint Ticker */}
+            {locationStats.length > 0 && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="mt-6 flex flex-wrap items-center gap-3"
+              >
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 rounded-full border border-blue-100/50">
+                  <Globe className="w-3.5 h-3.5 text-blue-500 animate-pulse" />
+                  <span className="text-[10px] font-bold text-blue-600 uppercase tracking-tighter">Worldwide Clusters</span>
+                </div>
+                {locationStats.map((loc, i) => (
+                  <div key={i} className="flex items-center gap-1.5 group">
+                    <MapPin className="w-3 h-3 text-slate-300 group-hover:text-rose-500 transition-colors" />
+                    <span className="text-xs font-semibold text-slate-600">{loc.name}</span>
+                    <span className="text-[10px] text-slate-400">({loc.count})</span>
+                    {i < locationStats.length - 1 && <span className="text-slate-200 ml-1">•</span>}
+                  </div>
+                ))}
+              </motion.div>
+            )}
             </motion.div>
         </div>
 
@@ -523,6 +570,13 @@ const AlumniDirectory = () => {
                             <div className="bg-blue-500 text-white text-[8px] px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
                               <Zap className="w-2 h-2 fill-white" />
                               LIVE
+                            </div>
+                          )}
+                          {/* Feature 2: The Bridge (Department Match) */}
+                          {currentUserProfile?.department === alum.department && (
+                            <div className="bg-rose-500 text-white text-[8px] px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+                              <Heart className="w-2 h-2 fill-white" />
+                              MATCH
                             </div>
                           )}
                         </CardTitle>
