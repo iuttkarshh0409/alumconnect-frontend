@@ -32,8 +32,17 @@ import {
   GraduationCap,
   ChevronRight,
   X,
-  Buildings,
+  Building2,
   Zap,
+  Sparkles,
+  TrendingUp,
+  PieChart,
+  Heart,
+  Bookmark,
+  Send,
+  Target,
+  MessageSquareQuote,
+  ArrowRight,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -50,6 +59,15 @@ const AlumniDirectory = () => {
     job_domain: "",
     graduation_year: "",
     skills: "",
+  });
+
+  // New Expert Operations States
+  const [featuredAlumni, setFeaturedAlumni] = useState([]);
+  const [heatmapStats, setHeatmapStats] = useState({
+    activeMentors: 0,
+    topDomain: "Loading...",
+    topSkill: "Loading...",
+    openRefers: 0
   });
 
   const fetchAlumni = useCallback(async () => {
@@ -78,6 +96,30 @@ const AlumniDirectory = () => {
       );
 
       setAlumni(response.data);
+
+      // Feature 2: Calculate Heatmap Stats
+      const stats = response.data.reduce((acc, alum) => {
+        if (alum.is_live) acc.activeMentors++;
+        if (alum.open_to_refer) acc.openRefers++;
+        return acc;
+      }, { activeMentors: 0, openRefers: 0 });
+
+      // Find top domain
+      const domains = response.data.map(a => a.job_domain).filter(Boolean);
+      const topDomain = domains.sort((a,b) =>
+        domains.filter(v => v===a).length - domains.filter(v => v===b).length
+      ).pop() || "SDE";
+
+      setHeatmapStats({
+        ...stats,
+        topDomain,
+        topSkill: "React.js" // Mock for now or extract from skills
+      });
+
+      // Feature 1: Populate Featured Track
+      const featured = response.data.filter(a => a.open_to_refer || a.is_live);
+      setFeaturedAlumni(featured.slice(0, 10));
+
     } catch (error) {
       toast.error("Failed to load alumni");
     } finally {
@@ -205,8 +247,95 @@ const AlumniDirectory = () => {
             <p className="text-xl text-slate-500 max-w-2xl font-light leading-relaxed">
               Explore your professional network. Connect with mentors, peers, and industry leaders from our verified alumni community.
             </p>
-          </motion.div>
+            </motion.div>
         </div>
+
+        {/* FEATURE 2: EXPERT HEATMAP BAR */}
+        <section className="mb-10">
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+          >
+            {[
+              { label: "Active Mentors", value: heatmapStats.activeMentors, icon: Zap, color: "text-blue-500", bg: "bg-blue-50" },
+              { label: "Top Domain", value: heatmapStats.topDomain, icon: Target, color: "text-purple-500", bg: "bg-purple-50" },
+              { label: "Hot Skill", value: heatmapStats.topSkill, icon: Sparkles, color: "text-amber-500", bg: "bg-amber-50" },
+              { label: "Open Refers", value: heatmapStats.openRefers, icon: Heart, color: "text-rose-500", bg: "bg-rose-50" }
+            ].map((stat, i) => (
+              <div key={i} className={`flex items-center gap-4 p-4 rounded-2xl border border-slate-100 bg-white/60 backdrop-blur-sm shadow-sm`}>
+                <div className={`w-10 h-10 ${stat.bg} ${stat.color} rounded-xl flex items-center justify-center`}>
+                  <stat.icon className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
+                  <p className="text-lg font-bold text-slate-900">{stat.value}</p>
+                </div>
+              </div>
+            ))}
+          </motion.div>
+        </section>
+
+        {/* FEATURE 1: PRIORITY REFERRAL TRACK (Horizontal Scroll) */}
+        {featuredAlumni.length > 0 && (
+          <section className="mb-12 overflow-hidden">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center text-white">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <h3 className="text-xl font-bold text-[#002147]">Priority Referral Track</h3>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="ghost" size="sm" className="text-slate-400 hover:text-[#002147]">
+                  View All <ArrowRight className="w-4 h-4 ml-1" />
+                </Button>
+              </div>
+            </div>
+            
+            <div className="flex gap-6 overflow-x-auto pb-6 -mx-2 px-2 no-scrollbar scroll-smooth">
+              {featuredAlumni.map((alum, i) => (
+                <motion.div
+                  key={`featured-${alum.user_id}`}
+                  whileHover={{ y: -5 }}
+                  className="flex-shrink-0 w-72"
+                >
+                  <Card 
+                    className="relative overflow-hidden border-none shadow-lg bg-[#002147] text-white p-5 h-40 flex flex-col justify-between cursor-pointer group"
+                    onClick={() => navigate(`/profile/${alum.user_id}`)}
+                  >
+                    {/* Decorative Elements */}
+                    <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-colors" />
+                    
+                    <div className="flex items-start gap-4 z-10">
+                      <Avatar className="w-12 h-12 border-2 border-white/20">
+                        <AvatarImage src={alum.user?.picture} />
+                        <AvatarFallback className="bg-white/10 text-white">
+                          {getInitials(alum.user?.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="overflow-hidden">
+                        <p className="font-bold truncate">{alum.user?.name}</p>
+                        <p className="text-xs text-white/60 truncate">{alum.job_title} @ {alum.company}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between z-10">
+                      <Badge className="bg-amber-400/20 text-amber-300 border-none text-[10px]">
+                        OPEN TO REFER
+                      </Badge>
+                      <div className="flex -space-x-2">
+                         {/* Mock mutual connections or just decorative */}
+                         <div className="w-6 h-6 rounded-full border-2 border-[#002147] bg-blue-400 flex items-center justify-center text-[8px]">DS</div>
+                         <div className="w-6 h-6 rounded-full border-2 border-[#002147] bg-green-400 flex items-center justify-center text-[8px]">AK</div>
+                      </div>
+                    </div>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* FILTERS */}
         <section className="mb-12">
@@ -332,7 +461,24 @@ const AlumniDirectory = () => {
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                 >
-                  <Card className="group h-full flex flex-col border-slate-200 hover:border-[#002147]/50 hover:shadow-xl hover:shadow-[#002147]/10 transition-all duration-300 bg-white">
+                  <Card className="group relative h-full flex flex-col border-slate-200 hover:border-[#002147]/50 hover:shadow-xl hover:shadow-[#002147]/10 transition-all duration-300 bg-white overflow-hidden">
+                    {/* Feature 5: Multi-Action Dock (FABs) */}
+                    <div className="absolute right-3 top-20 flex flex-col gap-2 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-300 z-20">
+                      {[
+                        { icon: Bookmark, color: "bg-white text-slate-400 hover:text-blue-500", label: "Save" },
+                        { icon: Heart, color: "bg-white text-slate-400 hover:text-rose-500", label: "Kudos" },
+                        { icon: Send, color: "bg-[#002147] text-white hover:bg-[#003366]", label: "Referral" }
+                      ].map((action, i) => (
+                        <button 
+                          key={i}
+                          className={`w-9 h-9 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95 ${action.color}`}
+                          title={action.label}
+                        >
+                          <action.icon className="w-4 h-4" />
+                        </button>
+                      ))}
+                    </div>
+
                     <CardHeader className="flex flex-row items-center gap-4 space-y-0 pb-6">
                       <Avatar className="w-14 h-14 border-2 border-slate-50 group-hover:border-[#002147]/20 transition-colors">
                         <AvatarImage src={alum.user?.picture} />
@@ -344,15 +490,10 @@ const AlumniDirectory = () => {
                         <CardTitle className="text-xl font-bold text-[#002147] truncate group-hover:text-[#002147]/80 transition-colors flex items-center gap-2">
                           {alum.user?.name}
                           {alum.is_live && (
-                            <motion.div
-                              initial={{ scale: 0.8 }}
-                              animate={{ scale: 1 }}
-                              repeat={Infinity}
-                              className="bg-blue-500 text-white text-[8px] px-1.5 py-0.5 rounded-md flex items-center gap-0.5 animate-pulse"
-                            >
+                            <div className="bg-blue-500 text-white text-[8px] px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
                               <Zap className="w-2 h-2 fill-white" />
                               LIVE
-                            </motion.div>
+                            </div>
                           )}
                         </CardTitle>
                         <CardDescription className="flex items-center gap-1 text-slate-500">
@@ -362,9 +503,16 @@ const AlumniDirectory = () => {
                       </div>
                     </CardHeader>
 
-                    <CardContent className="flex-1 space-y-5">
-                      {/* Job Info */}
-                      {(alum.job_domain || alum.company) && (
+                    <CardContent className="flex-1 space-y-4">
+                      {/* Feature 3: Wisdom Snippet */}
+                      {alum.latest_wisdom ? (
+                        <div className="relative p-3 rounded-xl bg-slate-50 border border-slate-100 group-hover:bg-[#002147]/5 transition-colors">
+                          <MessageSquareQuote className="absolute -top-2 -left-2 w-5 h-5 text-[#002147]/20" />
+                          <p className="text-xs italic text-slate-600 leading-relaxed line-clamp-2">
+                            "{alum.latest_wisdom}"
+                          </p>
+                        </div>
+                      ) : (
                         <div className="space-y-2.5">
                           {alum.job_domain && (
                             <div className="flex items-center gap-2.5 text-slate-600 text-sm">
@@ -374,9 +522,7 @@ const AlumniDirectory = () => {
                           )}
                           {alum.company && (
                             <div className="flex items-center gap-2.5 text-slate-600 text-sm">
-                              <div className="w-4 h-4 flex items-center justify-center">
-                                <span className="text-xs font-bold text-slate-400">@</span>
-                              </div>
+                              <div className="w-4 h-4 flex items-center justify-center text-slate-400 font-bold text-xs">@</div>
                               <span>{alum.company}</span>
                             </div>
                           )}
@@ -389,20 +535,18 @@ const AlumniDirectory = () => {
                           {(Array.isArray(alum.skills)
                             ? alum.skills
                             : alum.skills.split(",")
-                          ).map((skill, sIdx) => {
-                            const trimmedSkill =
-                              typeof skill === "string" ? skill.trim() : skill;
-                            if (!trimmedSkill) return null;
-                            return (
-                              <Badge
-                                key={sIdx}
-                                variant="secondary"
-                                className="bg-slate-100 text-slate-600 hover:bg-[#002147] hover:text-white transition-colors cursor-default text-[10px] font-medium py-0 px-2"
-                              >
-                                {trimmedSkill}
-                              </Badge>
-                            );
-                          })}
+                          ).slice(0, 3).map((skill, sIdx) => (
+                            <Badge
+                              key={sIdx}
+                              variant="secondary"
+                              className="bg-slate-100/50 text-slate-500 text-[9px] font-medium"
+                            >
+                              {typeof skill === "string" ? skill.trim() : skill}
+                            </Badge>
+                          ))}
+                          {alum.skills.length > 3 && (
+                            <span className="text-[9px] text-slate-400">+{alum.skills.length - 3} move</span>
+                          )}
                         </div>
                       )}
                     </CardContent>
