@@ -1,46 +1,63 @@
-# 🛡️ Alumni Directory: The Discovery & Analytics Hub
-## (UI Component: `AlumniDirectory.js`)
+# 🛡️ Alumni Directory: The Discovery & Analytics Command Center
+## Component ID: `AlumniDirectory.js`
 
-The **Alumni Directory** is the "Command Center." It is the most data-dense and interactive part of the platform, combining professional search with live community analytics.
-
----
-
-### 🏛️ 1. Sticky Discovery Sidebar (The Command Console)
-The sidebar is always active, allowing the user to search while browsing results. It includes:
-
-*   **🏆 Network Power Index (NPI)**
-    *   **Aesthetic**: Gamified Career Stats.
-    *   **Elements**: **Gravitas Score** (Hero number), **Profile Sync**, **Network Reach**, and **Influence Hub** progress bars.
-    *   **Goal**: To show the student their growing professional authority within the network.
-*   **📡 Discovery Hub (Advanced Filters)**
-    *   **Universal Search**: A "Command-K" style bar for names, companies, or skills.
-    *   **Multi-Mode Selectors**: High-fidelity dropdowns for **Job Domain**, **Target Company**, and **Graduation Year**.
-*   **🌍 Worldwide Pulse**
-    *   **Aesthetic**: Real-time Ticker.
-    *   **Features**: A mini-widget showing the largest clusters of alumni across different global cities (e.g., "50 in Bangalore," "12 in London").
-
-### 📊 2. Expert Heatmap Bar (The Analytics Ticker)
-A top-level row of metrics providing an "instant recon" of the community:
-*   **📈 Active Mentors (Activity)**: How many alumni are currently online/responsive.
-*   **🧭 Top Domain (Compass)**: Shows the most prevalent industry among the visible results.
-*   **⚙️ Hot Skill (Cpu)**: The most popular technical skill in the current filter.
-*   **🤝 Open Refers (Handshake)**: A count of alumni currently "high respondent" for referrals.
-
-### 🌟 3. Priority Network Track (The Gallery)
-A horizontal-scroll gallery for featured alumni (those most active or with the highest NPI scores).
-*   **Visual**: Glassmorphic dark gradient cards.
-*   **Goal**: To create a "VIP" discovery space for high-quality connections.
-
-### 🛡️ 4. Verified Pioneers Feed (Dossier Cards)
-The main result list, featuring data-dense alumni cards with advanced status indicators:
-*   **🛰️ Live/Match Status Halos**: 
-    *   **Live**: A blue pulsing halo and ping indicator for alumni currently active.
-    *   **Match**: A rose-amber halo for alumni from the same department as the user.
-*   **🔖 Multi-Action Utility Dock**: (Appears on hover)
-    *   **Save**: Bookmark the pioneer to your network.
-    *   **Kudos**: Send an endorsement heart.
-    *   **Referral**: Quick-trigger a referral inquiry.
-*   **📜 Latest Wisdom**: A quote block for the alumnus' most recent bio or insight.
+The **Alumni Directory** is the "Professional Reconnaissance Center" of AlumConnect. It is the most technically complex UI in the ecosystem, designed to transform a static database into a living, breathing community of experts.
 
 ---
-> **Design Philosophy**: The Directory UI uses **Enterprise Glassmorphism** and **Dynamic Status Halos** to make a static list feel like a living professional ecosystem.
+
+### 🏛️ 1. Sidebar Command Console: The Network Power Index (NPI)
+*   **What it is**: A data-dense personal authority tracker for the user.
+*   **Deep Detail**:
+    *   **📈 Gravitas Leveling**: Features a hero score (**742**) and a "LVL 84" rank badge. These are designed to show the student's relative "gravity" in the network as they complete their profile and book sessions.
+    *   **📊 Triple-Track Progress**: 
+        *   **Profile Sync**: Measures how complete the student's profile is for mentor matching.
+        *   **Network Reach**: Tracks how many different domains/companies the user has reached.
+        *   **Influence Hub**: Tracks the "kudos" and responses received.
+    *   **🛰️ Tactical Recon Indicator**: A pulsing emerald beacon at the bottom of the card signals that the platform is actively scanning for matches.
+*   **Visual Aesthetics**: Uses a deep midnight gradient (`from-[#002147] to-[#003366]`) with high-fidelity blur-filters (`blur-[60px]`) for a premium aeronautical look.
+
+### 📡 2. Discovery Hub: The Universal Search Logic
+*   **What it is**: The primary filter interface for finding mentors.
+*   **Deep Detail**:
+    *   **🔍 Universal Search Bar**: A "High-Focus" input that allows students to type anything from names to job titles. It uses a `searchTerm` state to filter results in real-time.
+    *   **🏗️ Multi-Mode Selectors**: Three strategic dropdowns (Job Domain, Target Company, and Graduation Year). 
+    *   **The Filter Logic**: The `fetchAlumni` function uses `URLSearchParams` to pass these filters to the backend, ensuring that only the most relevant "Pioneers" are returned to the screen.
+*   **Tactical Action**: The "Clear Selection" button triggers the `clearFilters` function, performing a surgical reset of all parameters to restore the full community view.
+
+### 📊 3. Expert Heatmap Bar: Community Telemetry
+*   **What it is**: A top-level row of metrics providing an "instant snapshot" of the network.
+*   **Component Telemetry**:
+    *   **Activity (Active Mentors)**: A count of how many alumni are currently online, signaling "high availability."
+    *   **Compass (Top Domain)**: Dynamically calculates the most prevalent industry among the visible alumni.
+    *   **Cpu (Hot Skill)**: Highlights the technical skill currently trending in the results.
+    *   **Handshake (Open Refers)**: Tracks how many alumni have explicitly marked themselves as "Open to Refer."
+*   **Purpose**: It allows a student to understand the "industry gravity" of the current community before sending a request.
+
+### 🌟 4. Priority Network Track: The VIP Gallery
+*   **What it is**: A horizontal gallery showcasing high-momentum alumni.
+*   **Deep Detail**:
+    *   **Curation Logic**: This track is populated from the `featuredAlumni` state, which prioritizes alumni who are `is_live` or `open_to_refer`.
+    *   **Engagement Signals**: Each card features a **"High Respondent"** badge, signaling to the student that this connection has a high probability of answering.
+*   **Visual Logic**: Wrapped in `motion.div` for smooth hover-scaling and `whileHover: { y: -5 }` to imply "elevation."
+
+### 🛡️ 5. Verified Talents: The Dossier Feed
+The main result engine. Each card is a "Professional Dossier" with three layers of intelligence:
+
+*   **🛰️ Layer 1: Status Halos**:
+    *   **Live (Blue Halo)**: If `alum.is_live` is true, the avatar is surrounded by a blue pulsing glow, signaling immediate availability.
+    *   **Match (Rose Halo)**: If the student and alumni share the same department, a rose-amber halo appears, signaling a "Community Match."
+*   **🔖 Layer 2: Multi-Action Utility Dock**:
+    *   **Save (Bookmark)**: Allows students to build a "Shortlist" for later outreach.
+    *   **Kudos (Heart)**: A micro-endorsement to acknowledge an alumnus' profile or career milestones.
+    *   **Referral (Send)**: A "High-Intent" trigger that initiates a referral request flow.
+*   **📜 Layer 3: Wisdom Fragments**:
+    *   The `latest_wisdom` quote block elevates the card from a resume to a "conversation starter" by displaying a short, personal professional insight from the Alumnus.
+
+### 🌍 6. Worldwide Pulse: Global Cluster Ticker
+*   **What it is**: A location-based analytics widget.
+*   **Deep Detail**:
+    *   **The Logic**: Dynamically counts occurrences of cities/countries from the alumni data and sorts them to show where the network's "Main Clusters" are located.
+    *   **Purpose**: Encourages students to look beyond local opportunities and visualize their career at a global scale.
+
+---
+> **Architecture Summary**: The Directory is built on **"High-Trust Glassmorphism."** By using status halos and real-time telemetry, we remove the "coldness" of a member list and replace it with a living map of human expertise.
