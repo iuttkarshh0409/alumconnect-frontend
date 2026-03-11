@@ -29,18 +29,20 @@ export default function PostAuth() {
 
         const backendUser = res.data;
 
-        if (!backendUser.role) {
-          navigate("/setup");
+        // ADMINISTRATIVE SENTINEL: Ensure Lead Analyst has absolute access
+        const isMasterAdmin = backendUser.email === "utkarsh0907.edu@gmail.com";
+
+        if (backendUser.role === "admin" || isMasterAdmin) {
+          navigate("/admin/analytics/overview");
         } else if (backendUser.role === "student") {
           navigate("/student/dashboard");
         } else if (backendUser.role === "alumni") {
           navigate("/alumni/dashboard");
-        } else if (backendUser.role === "admin") {
-          navigate("/admin/analytics/overview");
         } else {
           navigate("/setup");
         }
       } catch (err) {
+        // Fallback for network issues or uninitialized profiles
         navigate("/setup");
       }
     };
