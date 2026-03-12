@@ -377,33 +377,44 @@ const AlumniDashboard = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-12">
-        {/* WELCOME SECTION */}
-        <section className="mb-12">
+        {/* WELCOME HERO SECTION */}
+        <section className="mb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
+            className="relative p-12 bg-white dark:bg-[#001c3d] rounded-[3rem] border border-slate-100 dark:border-white/5 shadow-sm overflow-hidden"
           >
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-              <div>
-                <h2 className="font-serif text-5xl font-extrabold text-[#002147] dark:text-white mb-4 tracking-tight">
-                  Hello, {user?.name?.split(" ")[0]}!
+            <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl -mr-48 -mt-48" />
+            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-10">
+              <div className="space-y-4">
+                <Badge className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-none px-4 py-1.5 font-black uppercase tracking-[0.2em] text-[10px]">
+                   Mentor Professional Console
+                </Badge>
+                <h2 className="font-serif text-5xl md:text-7xl font-black text-[#002147] dark:text-white mb-2 tracking-tighter leading-[0.85]">
+                  Your Mentorship <br/>
+                  <span className="text-slate-300 dark:text-white/20">Dashboard.</span>
                 </h2>
-                <div className="flex items-center gap-4 text-slate-500 dark:text-slate-400 font-medium tracking-tight">
-                  <span className="flex items-center gap-1.5">
-                    <Briefcase className="w-4 h-4 text-[#002147] dark:text-slate-500" />
-                    {profile?.job_title} at {profile?.company}
+                <div className="flex items-center gap-6 text-slate-500 dark:text-slate-400 font-bold text-xs uppercase tracking-widest">
+                  <span className="flex items-center gap-2">
+                    <Briefcase className="w-4 h-4 text-blue-500" />
+                    {profile?.job_title} @ {profile?.company}
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    Verified Alumni
                   </span>
                 </div>
               </div>
 
-              <Dialog open={editMode} onOpenChange={setEditMode}>
-                <DialogTrigger asChild>
-                  <Button className="bg-[#002147] dark:bg-slate-200 dark:text-[#002147] hover:bg-[#003366] dark:hover:bg-white text-white rounded-2xl px-8 py-6 h-auto text-lg font-black shadow-2xl shadow-[#002147]/30 dark:shadow-black/60 transition-all hover:scale-[1.05] hover:rotate-1 active:scale-95 group border border-white/10">
-                    <Edit className="w-5 h-5 mr-3 group-hover:rotate-12 transition-transform" />
-                    Master Profile
-                  </Button>
-                </DialogTrigger>
+              <div className="flex items-center gap-4">
+                <Dialog open={editMode} onOpenChange={setEditMode}>
+                  <DialogTrigger asChild>
+                    <Button className="bg-[#002147] dark:bg-white dark:text-[#002147] hover:scale-105 active:scale-95 text-white rounded-2xl px-10 py-7 h-auto text-lg font-black shadow-2xl shadow-blue-500/20 transition-all border-none">
+                      <Edit className="w-5 h-5 mr-3" />
+                      Configure Persona
+                    </Button>
+                  </DialogTrigger>
                 <DialogContent className="max-w-xl max-h-[90vh] overflow-hidden flex flex-col p-0 rounded-[3rem] border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.3)] bg-white dark:bg-[#000a12]">
                   <DialogHeader className="p-10 bg-gradient-to-br from-[#002147] via-[#0a3d62] to-[#001529] text-white relative overflow-hidden">
                     <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
@@ -499,8 +510,9 @@ const AlumniDashboard = () => {
                 </DialogContent>
               </Dialog>
             </div>
-          </motion.div>
-        </section>
+          </div>
+        </motion.div>
+      </section>
 
         {/* STATS TILES */}
         <section className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-16">
@@ -886,67 +898,136 @@ const AlumniDashboard = () => {
               </div>
             </section>
 
-            {/* REQUESTS LIST */}
-            <section className="space-y-8">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-6 px-2">
-                <div className="space-y-1">
-                  <h3 className="text-3xl font-serif font-black text-[#002147] dark:text-white tracking-tighter flex items-center gap-4">
-                    Expert <span className="text-slate-300 dark:text-white/20">Inbox</span>
-                  </h3>
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Mentorship Flow</p>
-                </div>
-                
-                {/* Feature 4: Priority Toggle/Badge UI Hint */}
-                <div className="flex items-center gap-3 bg-red-500/10 px-4 py-2 rounded-2xl border border-red-500/20">
-                   <Target className="w-4 h-4 text-red-500" />
-                   <p className="text-[9px] font-black uppercase tracking-widest text-red-600 dark:text-red-400 animate-pulse">Impact Sorting Active</p>
-                </div>
-              </div>
-
-              {requests.length === 0 ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="bg-white dark:bg-slate-900/50 rounded-[3rem] p-24 text-center border border-slate-100 dark:border-white/5 shadow-sm transition-colors"
-                >
-                  <div className="w-24 h-24 bg-slate-50 dark:bg-slate-800 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-inner">
-                    <Mail className="w-10 h-10 text-slate-200 dark:text-slate-700" />
+            {/* CATEGORIZED REQUESTS */}
+            <div className="space-y-20">
+              {/* PENDING REQUESTS SECTION */}
+              <section className="space-y-10">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-8 px-2">
+                  <div className="space-y-2">
+                    <h3 className="text-4xl font-serif font-black text-[#002147] dark:text-white tracking-tighter">
+                      Pending <span className="text-slate-300 dark:text-white/20">Requests</span>
+                    </h3>
+                    <p className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-400">Decision Queue</p>
                   </div>
-                  <h4 className="text-3xl font-black text-[#002147] dark:text-white mb-3 tracking-tighter">Zen Mode</h4>
-                  <p className="text-slate-400 dark:text-slate-500 max-w-[280px] mx-auto font-bold text-sm tracking-tight leading-relaxed italic">
-                    All mentorship waves have been caught. Time for a breather.
-                  </p>
-                </motion.div>
-              ) : (
-                <div className="space-y-6 pb-12">
-                  <AnimatePresence mode="popLayout">
-                    {/* Feature 4: Sort Priority First */}
-                    {[...requests].sort((a, b) => (b.isPriority === a.isPriority ? 0 : b.isPriority ? 1 : -1)).map((request, idx) => (
-                      <motion.div
-                        key={request.request_id}
-                        layout
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{ duration: 0.3, delay: idx * 0.05 }}
-                        className="relative"
-                      >
-                        {request.isPriority && request.status === "pending" && (
-                           <Badge className="absolute -top-3 -right-3 z-10 bg-red-600 text-white border-none text-[9px] font-black shadow-xl shadow-red-600/30 px-3 py-1.5 rounded-xl uppercase tracking-[0.2em] ring-4 ring-white dark:ring-slate-950">
-                             Priority
-                           </Badge>
-                        )}
+                  
+                  {requests.filter(r => r.status === 'pending').length > 0 && (
+                    <div className="flex items-center gap-3 bg-red-500/10 px-6 py-2.5 rounded-2xl border border-red-500/20">
+                      <Target className="w-4 h-4 text-red-500" />
+                      <p className="text-[10px] font-black uppercase tracking-widest text-red-600 dark:text-red-400">Attention Required</p>
+                    </div>
+                  )}
+                </div>
+
+                {requests.filter(r => r.status === 'pending').length === 0 ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="bg-white dark:bg-slate-900 rounded-[3rem] p-24 text-center border-2 border-dashed border-slate-50 dark:border-white/5 group"
+                  >
+                    <div className="w-24 h-24 bg-slate-50 dark:bg-slate-800/50 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 shadow-inner transition-transform group-hover:scale-110">
+                      <Clock className="w-10 h-10 text-slate-200 dark:text-slate-700" />
+                    </div>
+                    <h4 className="text-3xl font-serif font-black text-slate-800 dark:text-slate-200 mb-4 tracking-tight">Lead Queue Clear</h4>
+                    <p className="text-slate-400 dark:text-slate-500 max-w-sm mx-auto font-bold text-sm tracking-tight leading-relaxed italic">
+                      You're all caught up! New student requests will materialize here in real-time.
+                    </p>
+                  </motion.div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-10">
+                    <AnimatePresence mode="popLayout">
+                      {requests
+                        .filter(r => r.status === 'pending')
+                        .sort((a, b) => (b.isPriority === a.isPriority ? 0 : b.isPriority ? 1 : -1))
+                        .map((request, idx) => (
+                        <motion.div
+                          key={request.request_id}
+                          layout
+                          initial={{ opacity: 0, y: 30 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.9 }}
+                          transition={{ duration: 0.4, delay: idx * 0.1 }}
+                          className="relative"
+                        >
+                          {request.isPriority && (
+                             <Badge className="absolute -top-4 -right-4 z-20 bg-red-600 text-white border-none text-[10px] font-black shadow-2xl shadow-red-600/40 px-5 py-2 rounded-2xl uppercase tracking-[0.2em] ring-8 ring-white dark:ring-slate-950">
+                               Critical Logic
+                             </Badge>
+                          )}
+                          <MentorshipRequestCard
+                            request={request}
+                            userRole="alumni"
+                            onUpdate={fetchRequests}
+                          />
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                )}
+              </section>
+
+              {/* ACCEPTED MENTORSHIPS SECTION */}
+              <section className="space-y-10">
+                <div className="flex items-center gap-5 border-b border-slate-100 dark:border-white/5 pb-8 px-2">
+                  <div className="space-y-2">
+                    <h3 className="text-4xl font-serif font-black text-[#002147] dark:text-white tracking-tighter">
+                      Active <span className="text-slate-300 dark:text-white/20">Protocols</span>
+                    </h3>
+                    <p className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-400">Mentorship Sessions</p>
+                  </div>
+                </div>
+
+                {requests.filter(r => r.status === 'accepted').length === 0 ? (
+                  <div className="p-16 text-center border border-slate-100 dark:border-white/5 rounded-[3rem] bg-slate-50/50 dark:bg-slate-900/30">
+                     <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-300">No established sessions yet.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-8 opacity-80 hover:opacity-100 transition-opacity">
+                    {requests
+                      .filter(r => r.status === 'accepted')
+                      .reverse()
+                      .map((request) => (
                         <MentorshipRequestCard
+                          key={request.request_id}
                           request={request}
                           userRole="alumni"
                           onUpdate={fetchRequests}
                         />
-                      </motion.div>
                     ))}
-                  </AnimatePresence>
+                  </div>
+                )}
+              </section>
+
+              {/* RECENT ARCHIVE */}
+              <section className="space-y-10 opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-700">
+                <div className="flex items-center gap-4 border-b border-slate-100 dark:border-white/5 pb-6 px-2">
+                    <h3 className="text-xl font-serif font-black text-slate-400 uppercase tracking-widest">Archive</h3>
+                    <div className="h-px flex-1 bg-slate-100 dark:bg-white/5" />
                 </div>
-              )}
-            </section>
+                {requests.filter(r => r.status === 'rejected' || r.status === 'completed').length === 0 ? (
+                  <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest text-center py-4">History Ledger Clear</p>
+                ) : (
+                  <div className="space-y-4">
+                    {requests
+                      .filter(r => r.status === 'rejected' || r.status === 'completed')
+                      .slice(0, 3)
+                      .map((request) => (
+                        <div key={request.request_id} className="flex items-center justify-between p-6 bg-white dark:bg-slate-900/50 rounded-[2rem] border border-slate-50 dark:border-white/10 shadow-sm">
+                           <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center font-black text-xs text-slate-400">
+                                 {request.topic[0]}
+                              </div>
+                              <div>
+                                 <p className="text-sm font-black text-[#002147] dark:text-white tracking-tight">{request.topic}</p>
+                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{request.status}</p>
+                              </div>
+                           </div>
+                           <Badge variant="outline" className="text-[9px] border-slate-100 opacity-40">Archived</Badge>
+                        </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+            </div>
 
 
             {/* Bomb Extras: Achievement Shelf for Alumni */}
