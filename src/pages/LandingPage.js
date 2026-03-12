@@ -23,72 +23,46 @@ const handleLogin = () => {
   window.location.href = '/sign-in';
 };
   return (
-    <div className="min-h-screen bg-[#FDFDFD] dark:bg-slate-950 transition-colors duration-300">
-      {/* PROFESSIONAL NAV HEADER */}
-      <header className="fixed top-0 z-[100] w-full border-b border-white/10 bg-white/10 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center text-white">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center text-[#002147] font-black text-2xl shadow-2xl">
-              A
-            </div>
-            <h1 className="font-serif text-2xl font-bold tracking-tight">
-              AlumConnect
-            </h1>
+    <div className="min-h-screen bg-[#F9F9F7]">
+      {/* SIMPLE HEADER WITH ADMIN ACCESS */}
+      <header className="fixed top-0 z-[100] w-full bg-white/10 backdrop-blur-md border-b border-white/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-white rounded flex items-center justify-center text-[#002147] font-bold text-xl">A</div>
+            <span className="font-serif text-white font-bold text-xl tracking-tight">AlumConnect</span>
           </div>
-
-          <div className="flex items-center gap-6">
-            <button 
-              onClick={() => navigate('/sign-in')}
-              className="text-xs font-black uppercase tracking-[0.2em] hover:text-white/70 transition-colors"
-            >
-              Sign In
-            </button>
-            <button
-              onClick={() => navigate('/sign-in')}
-              className="bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-xl px-6 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95 group flex items-center gap-2"
-            >
-              <Shield className="w-3.5 h-3.5 text-blue-400" />
-              Admin Command
-            </button>
-          </div>
+          <button 
+            onClick={() => navigate('/sign-in')}
+            className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all backdrop-blur-sm border border-white/30 flex items-center gap-2"
+          >
+            <Shield className="w-4 h-4" />
+            Admin Panel
+          </button>
         </div>
       </header>
 
       {/* Hero Section */}
-      <div className="hero-gradient relative overflow-hidden pt-20">
-        {/* Abstract Background Element */}
-        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-500/10 rounded-full blur-[120px] -mr-96 -mt-96 animate-pulse" />
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 relative z-10">
+      <div className="hero-gradient relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <h1 className="font-serif text-5xl md:text-7xl font-black text-white leading-[1.1] mb-8 tracking-tighter">
-                Bridge the Gap <br/>
-                <span className="text-white/40">Between Generations.</span>
+              <h1 className="font-serif text-5xl md:text-6xl font-bold text-white leading-tight mb-6 mt-8">
+                Bridge the Gap Between Alumni & Students
               </h1>
-              <p className="text-xl text-white/70 leading-relaxed mb-12 max-w-lg font-medium">
-                The high-fidelity mentorship infrastructure for modern educational institutions. Empowering students with legacy wisdom.
+              <p className="text-lg text-white/90 leading-relaxed mb-8">
+                AlumConnect creates meaningful mentorship connections, empowering students with career guidance from verified alumni across top institutions.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button
-                  data-testid="hero-get-started-btn"
-                  onClick={handleLogin}
-                  className="bg-white text-[#002147] hover:bg-slate-100 shadow-2xl shadow-blue-900/40 transition-all duration-300 rounded-[1.5rem] px-10 py-5 font-black text-lg flex items-center justify-center gap-3 hover:scale-105 active:scale-95"
-                >
-                  Initiate Launch <ArrowRight className="w-6 h-6" />
-                </button>
-                <button
-                  onClick={() => navigate('/sign-in')}
-                  className="bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 text-white transition-all duration-300 rounded-[1.5rem] px-10 py-5 font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3"
-                >
-                  <Users className="w-5 h-5 text-blue-400" />
-                  View Directory
-                </button>
-              </div>
+              <button
+                data-testid="hero-get-started-btn"
+                onClick={handleLogin}
+                className="bg-white text-[#002147] hover:bg-white/90 shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8 py-3 font-medium inline-flex items-center gap-2"
+              >
+                Get Started <ArrowRight className="w-5 h-5" />
+              </button>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -195,49 +169,39 @@ const handleLogin = () => {
       </div>
 
       {/* CTA Section */}
-      <div className="bg-[#001529] py-24 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.1)_0%,transparent_70%)]" />
-        <div className="max-w-4xl mx-auto text-center px-4 relative z-10">
-          <h2 className="font-serif text-4xl md:text-6xl font-black text-white mb-8 tracking-tighter">
-            Ready to <span className="text-blue-500">Initiate?</span>
+      <div className="bg-[#002147] py-16">
+        <div className="max-w-4xl mx-auto text-center px-4">
+          <h2 className="font-serif text-4xl md:text-5xl font-semibold text-white mb-6">
+            Ready to Connect?
           </h2>
-          <p className="text-xl text-white/60 mb-12 font-medium">
-            Join the high-density network of elite alumni and ambitious students.
+          <p className="text-lg text-white/90 mb-8">
+            Join thousands of students and alumni building meaningful mentorship relationships.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-6">
-            <button
-              onClick={handleLogin}
-              className="bg-white text-[#002147] hover:bg-slate-100 shadow-2xl shadow-blue-500/20 transition-all duration-300 rounded-[1.2rem] px-12 py-4 font-black text-lg hover:scale-105 active:scale-95"
-            >
-              Sign Up Now
-            </button>
-            <button
-              onClick={() => navigate('/sign-in')}
-              className="bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-[1.2rem] px-12 py-4 font-black text-lg hover:scale-105 transition-all"
-            >
-              Explore Perks
-            </button>
-          </div>
+          <button
+            data-testid="cta-join-now-btn"
+            onClick={handleLogin}
+            className="bg-white text-[#002147] hover:bg-white/90 shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8 py-3 font-medium inline-flex items-center gap-2"
+          >
+            Join Now <ArrowRight className="w-5 h-5" />
+          </button>
         </div>
       </div>
 
-      {/* FOOTER */}
-      <footer className="bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-white/5 py-12">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-[#002147] rounded-lg flex items-center justify-center text-white font-black">A</div>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">© 2026 AlumConnect Infrastructure</p>
+      {/* REVERTED FOOTER WITH ADMIN ACCESS */}
+      <footer className="bg-white border-t border-slate-200 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 bg-[#002147] rounded flex items-center justify-center text-white font-bold text-xs">A</div>
+              <p className="text-sm text-slate-500 font-medium">© 2026 AlumConnect. All rights reserved.</p>
             </div>
-            <div className="flex gap-8 text-[10px] font-black uppercase tracking-widest text-slate-400">
-              <a href="#" className="hover:text-[#002147] transition-colors">Documentation</a>
-              <a href="#" className="hover:text-[#002147] transition-colors">Privacy</a>
-              <a href="#" className="hover:text-[#002147] transition-colors">Security</a>
+            <div className="flex items-center gap-6">
               <button 
                 onClick={() => navigate('/sign-in')}
-                className="text-blue-500 hover:text-blue-600 transition-colors"
+                className="text-sm text-blue-600 hover:text-blue-800 font-semibold transition-colors flex items-center gap-1"
               >
-                Admin Gateway
+                <Shield className="w-4 h-4" />
+                Admin Dashboard Access
               </button>
             </div>
           </div>
