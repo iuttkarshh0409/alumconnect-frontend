@@ -207,139 +207,151 @@ const StudentDashboard = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 pt-12">
-        {/* 🌟 ACTION HUB: WELCOME, FLASHCARDS & GOAL TRACKER */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 items-stretch">
-          <div className="lg:col-span-5 flex flex-col justify-center">
-            <Badge className="mb-4 bg-[#002147]/5 dark:bg-slate-100/5 text-[#002147] dark:text-slate-200 border-none px-4 py-1.5 font-black uppercase tracking-[0.2em] text-[10px] w-fit">
-              Active Student Session
+        {/* 🚀 ACTION HUB: WELCOME, FLASHCARDS & GOAL TRACKER */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-20 items-stretch">
+          <div className="lg:col-span-12 mb-4">
+             <Badge className="mb-4 bg-[#002147]/5 dark:bg-slate-100/5 text-[#002147] dark:text-slate-200 border-none px-4 py-1.5 font-black uppercase tracking-[0.2em] text-[10px] w-fit">
+              Academic Protocol Active
             </Badge>
-            <h2 className="font-serif text-5xl sm:text-6xl font-black text-[#002147] dark:text-white mb-6 tracking-tighter leading-[0.9]">
-              Hello, <span className="text-[#002147]/40 dark:text-white/40">{user?.name?.split(" ")[0]}!</span>
+          </div>
+          <div className="lg:col-span-5 flex flex-col justify-center">
+            <h2 className="font-serif text-5xl sm:text-7xl font-black text-[#002147] dark:text-white mb-6 tracking-tighter leading-[0.85]">
+              Welcome back, <br/>
+              <span className="text-[#002147]/40 dark:text-white/40">{user?.name?.split(" ")[0]}</span>
             </h2>
-            <div className="flex flex-wrap items-center gap-6 text-slate-400 dark:text-slate-500 font-bold text-sm uppercase tracking-wider">
-              <span className="flex items-center gap-2">
-                <GraduationCap className="w-5 h-5 text-[#002147] dark:text-slate-400" />
+            <div className="flex flex-wrap items-center gap-8 text-slate-400 dark:text-slate-500 font-bold text-xs uppercase tracking-[0.15em]">
+              <span className="flex items-center gap-2.5">
+                <GraduationCap className="w-5 h-5 text-blue-500" />
                 {user?.department}
               </span>
-              <span className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-[#002147] dark:text-slate-400" />
-                {stats.last_active ? formatDistanceToNow(new Date(stats.last_active), { addSuffix: true }) : 'Just now'}
+              <span className="flex items-center gap-2.5">
+                <Clock className="w-5 h-5 text-orange-400" />
+                {stats.last_active ? formatDistanceToNow(new Date(stats.last_active), { addSuffix: true }) : 'Active now'}
               </span>
             </div>
           </div>
 
           {/* Alumni Tips Flashcard (Center) */}
           <div className="lg:col-span-4 h-full">
-            <div className="h-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] p-8 flex flex-col justify-between relative overflow-hidden group">
-              <Quote className="absolute -top-2 -left-2 w-20 h-20 text-slate-200/40 dark:text-slate-800/20" />
+            <div className="h-full bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border border-slate-100 dark:border-slate-800 rounded-[2.5rem] p-10 flex flex-col justify-between relative overflow-hidden group shadow-sm hover:shadow-md transition-all duration-500">
+              <Quote className="absolute -top-4 -left-4 w-24 h-24 text-slate-200/30 dark:text-slate-800/20 rotate-12" />
               <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-2 mb-6">
                   <Flame className="w-4 h-4 text-orange-500" />
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Alumni Pro-Tip</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Insight of the Week</p>
                 </div>
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={tipIndex}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="min-h-[100px]"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="min-h-[120px]"
                   >
-                    <p className="text-lg font-bold text-[#002147] dark:text-slate-200 leading-tight mb-4 tracking-tight italic">
+                    <p className="text-xl font-bold text-slate-800 dark:text-slate-200 leading-[1.4] mb-6 tracking-tight italic">
                       "{proTips[tipIndex]?.text}"
                     </p>
                     <div className="flex items-center justify-between">
-                       <p className="text-[10px] font-black uppercase tracking-tighter text-slate-400">— {proTips[tipIndex]?.author_name || proTips[tipIndex]?.author}</p>
+                       <p className="text-[10px] font-black uppercase tracking-widest text-[#002147] dark:text-slate-400">
+                         <span className="opacity-40">BY </span>{proTips[tipIndex]?.author_name || proTips[tipIndex]?.author}
+                       </p>
                        {proTips[tipIndex]?.tip_id && (
                          <button 
                           onClick={() => handleHighFive(proTips[tipIndex]?.tip_id)}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all ${proTips[tipIndex]?.has_applauded ? 'bg-orange-500 text-white shadow-lg' : 'bg-white dark:bg-slate-800 text-slate-400 hover:bg-orange-50 hover:text-orange-500 shadow-sm'}`}
+                          className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all font-black text-[10px] uppercase tracking-tighter ${proTips[tipIndex]?.has_applauded ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' : 'bg-white dark:bg-slate-800 text-slate-400 hover:text-orange-500 border border-slate-100 dark:border-slate-700'}`}
                          >
                             <Hand className={`w-3.5 h-3.5 ${proTips[tipIndex]?.has_applauded ? 'fill-white' : ''}`} />
-                            <span className="text-[10px] font-black">{proTips[tipIndex]?.applauds_count || 0}</span>
+                            {proTips[tipIndex]?.applauds_count || 0}
                          </button>
                        )}
                     </div>
                   </motion.div>
                 </AnimatePresence>
               </div>
-              <div className="flex gap-1.5 mt-4">
+              <div className="flex gap-2 mt-6">
                 {proTips.map((_, i) => (
-                  <div key={i} className={`h-1 rounded-full transition-all duration-300 ${i === tipIndex ? 'w-6 bg-[#002147] dark:bg-slate-200' : 'w-2 bg-slate-200 dark:bg-slate-800'}`} />
+                  <div key={i} className={`h-1 rounded-full transition-all duration-500 ${i === tipIndex ? 'w-8 bg-[#002147] dark:bg-blue-500' : 'w-2 bg-slate-200 dark:bg-slate-800'}`} />
                 ))}
               </div>
             </div>
           </div>
 
           {/* Goal Streak Widget (Right) */}
-          <Card className="lg:col-span-3 bg-[#002147] dark:bg-[#001529] text-white border-none shadow-2xl shadow-[#002147]/30 dark:shadow-black/50 p-8 rounded-[2rem] relative overflow-hidden group">
-            <Sparkles className="absolute -top-4 -right-4 w-24 h-24 text-white/5 rotate-12 group-hover:scale-125 transition-transform duration-700" />
-            <div className="relative z-10">
-              <div className="flex justify-between items-center mb-6">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50">Mission Tracker</p>
-                <Badge className="bg-white/10 text-white border-none text-[10px]">{acceptedCount}/{MENTOR_GOAL} Goal</Badge>
+          <Card className="lg:col-span-3 bg-[#002147] dark:bg-[#001529] text-white border-none shadow-2xl shadow-[#002147]/20 dark:shadow-black/40 p-10 rounded-[2.5rem] relative overflow-hidden group">
+            <Sparkles className="absolute -top-8 -right-8 w-32 h-32 text-white/5 rotate-12 group-hover:scale-110 transition-transform duration-1000" />
+            <div className="relative z-10 flex flex-col h-full">
+              <div className="flex justify-between items-center mb-8">
+                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Progression</p>
+                <div className="px-3 py-1 bg-white/10 rounded-lg text-[9px] font-black uppercase tracking-widest">{acceptedCount}/{MENTOR_GOAL} Target</div>
               </div>
-              <h3 className="text-2xl font-serif font-black mb-2">Connect Streak</h3>
-              <div className="w-full h-3 bg-white/10 rounded-full mb-4 overflow-hidden">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progressPercent}%` }}
-                  className="h-full bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full"
-                />
+              <h3 className="text-3xl font-serif font-black mb-4 tracking-tighter">Velocity</h3>
+              <div className="mt-auto">
+                <div className="w-full h-2.5 bg-white/10 rounded-full mb-6 overflow-hidden">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progressPercent}%` }}
+                    transition={{ duration: 1.5, ease: "easeOut" }}
+                    className="h-full bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full relative"
+                  >
+                    <div className="absolute top-0 right-0 w-8 h-full bg-white/20 skew-x-12 animate-shimmer" />
+                  </motion.div>
+                </div>
+                <p className="text-[11px] font-bold text-white/50 leading-relaxed uppercase tracking-widest">
+                  {acceptedCount === 0 ? "Initiate first Outreach" : `${progressPercent}% towards Milestone 1`}
+                </p>
               </div>
-              <p className="text-xs font-medium text-white/60 leading-relaxed italic">
-                {acceptedCount === 0 ? "Ready to spark your first conversation?" : `You've locked in ${acceptedCount} expert sessions. Keep pushing!`}
-              </p>
             </div>
           </Card>
         </section>
 
         {/* 🏆 TROPHY ROOM BAND */}
-        <section className="mb-12">
-           <div className="flex items-center gap-3 mb-6">
-              <Trophy className="w-5 h-5 text-yellow-500" />
-              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Achievement Shelf</h3>
+        <section className="mb-24">
+           <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-3">
+                <Trophy className="w-5 h-5 text-yellow-500" />
+                <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Distinction Shelf</h3>
+              </div>
+              <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800 ml-8" />
            </div>
-           <div className="flex flex-wrap gap-4">
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {achievements.map((item) => (
                 <div 
                   key={item.id} 
-                  className={`flex items-center gap-3 px-6 py-4 rounded-2xl border transition-all duration-500 ${item.unlocked 
-                    ? 'bg-white dark:bg-slate-900 border-yellow-500/30 dark:border-yellow-500/20 shadow-lg shadow-yellow-500/5' 
-                    : 'bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 opacity-40 grayscale'}`}
+                  className={`group flex items-center gap-5 px-8 py-6 rounded-3xl border transition-all duration-500 ${item.unlocked 
+                    ? 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1' 
+                    : 'bg-slate-50/50 dark:bg-slate-900/30 border-transparent opacity-60'}`}
                 >
-                  <div className={`p-2 rounded-xl ${item.unlocked ? 'bg-yellow-500/10 text-yellow-500' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
-                    <item.icon className="w-5 h-5" />
+                  <div className={`p-3 rounded-2xl transition-transform duration-500 group-hover:scale-110 ${item.unlocked ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
+                    <item.icon className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className={`text-[10px] font-black uppercase tracking-widest ${item.unlocked ? 'text-[#002147] dark:text-slate-200' : 'text-slate-400'}`}>
+                    <p className={`text-[11px] font-black uppercase tracking-[0.1em] mb-1 ${item.unlocked ? 'text-slate-900 dark:text-slate-100' : 'text-slate-400'}`}>
                       {item.label}
                     </p>
-                    <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 italic">{item.desc}</p>
+                    <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500">{item.desc}</p>
                   </div>
-                  {item.unlocked && <Sparkles className="w-3 h-3 text-yellow-500 animate-pulse" />}
                 </div>
               ))}
            </div>
         </section>
 
         {/* 📊 PULSE & STATS ROW */}
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
-          <StatMiniCard title="Active" val={pendingCount} tint="bg-yellow-500" icon={Clock} />
-          <StatMiniCard title="Meetings" val={acceptedCount} tint="bg-green-500" icon={TrendingUp} />
-          <StatMiniCard title="Network" val={stats.verified_alumni_count} tint="bg-[#002147]" icon={Users} />
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-24">
+          <StatMiniCard title="Active Flux" val={pendingCount} tint="text-orange-500" icon={Clock} />
+          <StatMiniCard title="Engagement" val={acceptedCount} tint="text-blue-500" icon={TrendingUp} />
+          <StatMiniCard title="Alumni Index" val={stats.verified_alumni_count} tint="text-emerald-500" icon={Users} />
           
           {/* Department Leaderboard Card */}
-          <div className="bg-slate-50 dark:bg-slate-900 rounded-3xl p-6 border border-slate-100 dark:border-slate-800 transition-colors">
-            <div className="flex items-center gap-2 mb-4">
+          <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
+            <div className="flex items-center gap-3 mb-6">
               <Zap className="w-4 h-4 text-orange-500" />
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Campus Pulse</p>
+              <p className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Campus Pulse</p>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {leaderboard.map((item, idx) => (
                 <div key={item.program} className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-600 dark:text-slate-400">#{idx + 1} {item.program}</span>
-                  <span className="text-[10px] font-black text-[#002147] dark:text-white bg-white dark:bg-slate-800 px-2 py-0.5 rounded-full shadow-sm">{item.count} Alums</span>
+                  <span className="text-xs font-bold text-slate-600 dark:text-slate-400 tracking-tight">#{idx + 1} {item.program}</span>
+                  <Badge variant="outline" className="text-[10px] font-black border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 rounded-lg px-2 shadow-none">{item.count} Active</Badge>
                 </div>
               ))}
             </div>
@@ -348,32 +360,40 @@ const StudentDashboard = () => {
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-16">
           {/* 📅 REQUESTS TRACKER (MAIN COLUMN) */}
-          <div className="xl:col-span-2 space-y-8">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-6">
-              <h3 className="text-3xl font-serif font-black text-[#002147] dark:text-white flex items-center gap-4 tracking-tighter">
-                <BookOpen className="w-8 h-8 opacity-20 dark:opacity-40" />
-                Requests Log
-              </h3>
-              <Button onClick={() => navigate("/directory")} className="bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-xl h-10 px-6 font-bold text-xs hover:bg-[#002147] dark:hover:bg-white transition-all">
-                New Outreach
+          <div className="xl:col-span-2 space-y-10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-slate-100 dark:border-slate-800 pb-10">
+              <div className="space-y-1">
+                <h3 className="text-4xl font-serif font-black text-[#002147] dark:text-white tracking-tighter">
+                  Outreach Ledger
+                </h3>
+                <p className="text-sm text-slate-400 dark:text-slate-500 font-medium">Coordinate your professional connections and session intents.</p>
+              </div>
+              <Button onClick={() => navigate("/directory")} className="bg-[#002147] dark:bg-blue-600 text-white rounded-2xl h-12 px-8 font-black text-[11px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-blue-500/20">
+                Initiate Outreach
               </Button>
             </div>
 
             {requests.length === 0 ? (
-              <div className="bg-white dark:bg-slate-900/50 rounded-3xl p-20 text-center border-4 border-dashed border-slate-50 dark:border-slate-800/50 relative group">
-                <Search className="w-12 h-12 text-slate-100 dark:text-slate-800 mx-auto mb-4 group-hover:scale-110 transition-transform" />
-                <h4 className="text-xl font-bold text-[#002147] dark:text-white mb-2">The log is empty</h4>
-                <p className="text-slate-400 dark:text-slate-500 text-sm font-medium mb-8">Reach out to mentors to see them tracked here.</p>
+              <div className="bg-white dark:bg-slate-900 rounded-[3rem] p-24 text-center border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-blue-50/50 dark:bg-blue-500/5 rounded-full blur-3xl" />
+                <div className="relative z-10 max-w-xs mx-auto">
+                  <div className="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-inner">
+                    <Search className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+                  </div>
+                  <h4 className="text-2xl font-serif font-black text-slate-800 dark:text-white mb-4 tracking-tight">Clear Ledger</h4>
+                  <p className="text-sm text-slate-400 dark:text-slate-500 font-medium leading-relaxed mb-10">Your mentorship queue is empty. Access the Alumni Directory to begin your outreach strategy.</p>
+                  <Button variant="outline" onClick={() => navigate("/directory")} className="rounded-xl px-10 border-slate-200 dark:border-slate-700 text-[10px] font-black uppercase tracking-widest">Open Directory</Button>
+                </div>
               </div>
             ) : (
-              <div className="space-y-10">
+              <div className="space-y-12">
                 <AnimatePresence mode="popLayout">
                   {requests.map((request, idx) => (
                     <motion.div
                       key={request.request_id}
                       layout
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.1 }}
                     >
                       <MentorshipRequestCard
@@ -389,27 +409,29 @@ const StudentDashboard = () => {
           </div>
 
           {/* Quick-Drop Resource Library (Sidebar) */}
-          <aside className="space-y-10">
-            <h3 className="text-xl font-serif font-black text-[#002147] dark:text-white tracking-tight">Growth Kit</h3>
-            <div className="space-y-4">
-              <ResourceCard 
-                title="IIPS Placement Wiki" 
-                desc="Cracking campus interviews with alumni notes."
-                icon={FileText}
-                color="text-blue-500"
-              />
-              <ResourceCard 
-                title="Email Like a Pro" 
-                desc="3 templates to get mentors to say YES."
-                icon={Lightbulb}
-                color="text-yellow-500"
-              />
-              <ResourceCard 
-                title="Mock Interview prep" 
-                desc="Top 50 technical questions by department."
-                icon={Rocket}
-                color="text-purple-500"
-              />
+          <aside className="space-y-12">
+            <div>
+              <h3 className="text-2xl font-serif font-black text-[#002147] dark:text-white tracking-tight mb-8">Strategic Kit</h3>
+              <div className="space-y-5">
+                <ResourceCard 
+                  title="Placement Manual" 
+                  desc="High-density interview blueprints."
+                  icon={FileText}
+                  color="text-blue-500"
+                />
+                <ResourceCard 
+                  title="Communication Suite" 
+                  desc="High-response email architectures."
+                  icon={Lightbulb}
+                  color="text-orange-500"
+                />
+                <ResourceCard 
+                  title="Tactical Mockups" 
+                  desc="Departmental stress-test simulations."
+                  icon={Rocket}
+                  color="text-indigo-500"
+                />
+              </div>
             </div>
 
             <div className="p-8 bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 mt-12">
@@ -431,25 +453,25 @@ const StudentDashboard = () => {
 
 // Internal Mini-Components
 const StatMiniCard = ({ title, val, tint, icon: Icon }) => (
-  <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-    <div className="flex items-center justify-between mb-4">
-      <div className={`p-2 rounded-xl bg-slate-50 dark:bg-slate-800 ${tint.replace('bg-', 'text-')}`}>
+  <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] p-8 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-500 group">
+    <div className="flex items-center justify-between mb-6">
+      <div className={`p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 transition-colors duration-500 group-hover:bg-slate-100 dark:group-hover:bg-slate-700 ${tint}`}>
         <Icon className="w-5 h-5" />
       </div>
-      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{title}</p>
+      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">{title}</p>
     </div>
-    <p className="text-3xl font-black text-[#002147] dark:text-white tracking-tighter">{val}</p>
+    <p className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter leading-none">{val}</p>
   </div>
 );
 
 const ResourceCard = ({ title, desc, icon: Icon, color }) => (
-  <button className="w-full text-left p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-[#002147] dark:hover:border-white hover:shadow-lg transition-all group flex gap-4">
-    <div className={`mt-1 ${color} group-hover:scale-110 transition-transform`}>
-      <Icon className="w-6 h-6" />
+  <button className="w-full text-left p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-blue-500/50 dark:hover:border-blue-400 group flex gap-5 transition-all duration-300 hover:shadow-lg shadow-blue-500/5 hover:-translate-x-1">
+    <div className={`mt-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 transition-all duration-500 group-hover:scale-110 group-hover:bg-white dark:group-hover:bg-slate-700 ${color}`}>
+      <Icon className="w-5 h-5 outline-none" />
     </div>
-    <div>
-      <h4 className="text-sm font-black text-[#002147] dark:text-white mb-1">{title}</h4>
-      <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold leading-relaxed">{desc}</p>
+    <div className="flex flex-col justify-center">
+      <h4 className="text-[13px] font-black text-slate-900 dark:text-slate-100 mb-1 leading-tight">{title}</h4>
+      <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-tight leading-relaxed">{desc}</p>
     </div>
   </button>
 );
