@@ -377,44 +377,33 @@ const AlumniDashboard = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-12">
-        {/* WELCOME HERO SECTION */}
-        <section className="mb-20">
+        {/* WELCOME SECTION */}
+        <section className="mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="relative p-12 bg-white dark:bg-[#001c3d] rounded-[3rem] border border-slate-100 dark:border-white/5 shadow-sm overflow-hidden"
           >
-            <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl -mr-48 -mt-48" />
-            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-10">
-              <div className="space-y-4">
-                <Badge className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-none px-4 py-1.5 font-black uppercase tracking-[0.2em] text-[10px]">
-                   Mentor Professional Console
-                </Badge>
-                <h2 className="font-serif text-5xl md:text-7xl font-black text-[#002147] dark:text-white mb-2 tracking-tighter leading-[0.85]">
-                  Your Mentorship <br/>
-                  <span className="text-slate-300 dark:text-white/20">Dashboard.</span>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <div>
+                <h2 className="font-serif text-5xl font-extrabold text-[#002147] dark:text-white mb-4 tracking-tight">
+                  Hello, {user?.name?.split(" ")[0]}!
                 </h2>
-                <div className="flex items-center gap-6 text-slate-500 dark:text-slate-400 font-bold text-xs uppercase tracking-widest">
-                  <span className="flex items-center gap-2">
-                    <Briefcase className="w-4 h-4 text-blue-500" />
-                    {profile?.job_title} @ {profile?.company}
-                  </span>
-                  <span className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    Verified Alumni
+                <div className="flex items-center gap-4 text-slate-500 dark:text-slate-400 font-medium tracking-tight">
+                  <span className="flex items-center gap-1.5">
+                    <Briefcase className="w-4 h-4 text-[#002147] dark:text-slate-500" />
+                    {profile?.job_title} at {profile?.company}
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
-                <Dialog open={editMode} onOpenChange={setEditMode}>
-                  <DialogTrigger asChild>
-                    <Button className="bg-[#002147] dark:bg-white dark:text-[#002147] hover:scale-105 active:scale-95 text-white rounded-2xl px-10 py-7 h-auto text-lg font-black shadow-2xl shadow-blue-500/20 transition-all border-none">
-                      <Edit className="w-5 h-5 mr-3" />
-                      Configure Persona
-                    </Button>
-                  </DialogTrigger>
+              <Dialog open={editMode} onOpenChange={setEditMode}>
+                <DialogTrigger asChild>
+                  <Button className="bg-[#002147] dark:bg-slate-200 dark:text-[#002147] hover:bg-[#003366] dark:hover:bg-white text-white rounded-2xl px-8 py-6 h-auto text-lg font-black shadow-2xl shadow-[#002147]/30 dark:shadow-black/60 transition-all hover:scale-[1.05] hover:rotate-1 active:scale-95 group border border-white/10">
+                    <Edit className="w-5 h-5 mr-3 group-hover:rotate-12 transition-transform" />
+                    Master Profile
+                  </Button>
+                </DialogTrigger>
                 <DialogContent className="max-w-xl max-h-[90vh] overflow-hidden flex flex-col p-0 rounded-[3rem] border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.3)] bg-white dark:bg-[#000a12]">
                   <DialogHeader className="p-10 bg-gradient-to-br from-[#002147] via-[#0a3d62] to-[#001529] text-white relative overflow-hidden">
                     <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
@@ -510,9 +499,8 @@ const AlumniDashboard = () => {
                 </DialogContent>
               </Dialog>
             </div>
-          </div>
-        </motion.div>
-      </section>
+          </motion.div>
+        </section>
 
         {/* STATS TILES */}
         <section className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-16">
