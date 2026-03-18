@@ -178,17 +178,19 @@ const MentorshipRequestCard = ({ request, userRole, onUpdate }) => {
       )}
 
       {request.status === "accepted" && displayUser && (
-        <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900/30 rounded-lg p-3 mt-4 transition-colors flex justify-between items-center">
-          <div>
+        <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900/30 rounded-lg p-3 mt-4 transition-colors flex justify-between items-center gap-4">
+          <div className="flex-1">
             <p className="text-sm text-green-800 dark:text-green-400 mb-1 font-bold tracking-tight uppercase text-[10px]">
-              Contact Information
+              Next Step
             </p>
-            <p className="text-sm text-green-700 dark:text-green-300 font-medium">{displayUser.email}</p>
+            <p className="text-xs text-green-700 dark:text-green-300 font-medium leading-relaxed">
+              ✅ Connection Established! Click Message to introduce yourself and coordinate session timings.
+            </p>
           </div>
           <Button
             size="sm"
             onClick={handleOpenChat}
-            className="rounded-full bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+            className="rounded-xl bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 font-bold text-xs"
           >
             <MessageSquare className="w-4 h-4" />
             Message
