@@ -47,49 +47,68 @@ const ChatSheet = ({ open, onOpenChange, conversationId, otherParticipant }) => 
     fetchMessages();
 
     let socket;
+    let reconnectTimeout = null;
+
     const connectWS = async () => {
-      const token = await getToken();
-      socket = new WebSocket(`${WS_URL}/ws/${conversationId}?token=${token}`);
+      try {
+        const token = await getToken();
+        socket = new WebSocket(`${WS_URL}/ws/${conversationId}?token=${token}`);
 
-      socket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        
-        if (data.type === "typing") {
-          if (data.sender_id !== userId) {
-            setIsOtherTyping(data.is_typing);
+        socket.onopen = () => console.log("Chat WS Connected");
+
+        socket.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            
+            if (data.type === "typing") {
+              if (data.sender_id !== userId) {
+                setIsOtherTyping(data.is_typing);
+              }
+              return;
+            }
+
+            if (data.type === "read_receipt") {
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.sender_id === data.reader_id || m.conversation_id !== data.conversation_id
+                    ? m
+                    : { ...m, read_at: new Date().toISOString() }
+                )
+              );
+              return;
+            }
+            
+            setMessages((prev) => {
+              const exists = prev.some(m => m.message_id === data.message_id || (m.message_id?.startsWith("temp_") && m.content === data.content && m.sender_id === data.sender_id));
+              if (exists) {
+                return prev.map(m => (m.sender_id === data.sender_id && m.content === data.content && m.message_id?.startsWith("temp_")) ? data : m);
+              }
+              return [...prev, data];
+            });
+          } catch (err) {
+            console.error("Message parse error", err);
           }
-          return;
-        }
+        };
 
-        if (data.type === "read_receipt") {
-          // Update reads dynamically
-          setMessages((prev) =>
-            prev.map((m) =>
-              m.sender_id === data.reader_id || m.conversation_id !== data.conversation_id
-                ? m
-                : { ...m, read_at: new Date().toISOString() }
-            )
-          );
-          return;
-        }
-        
-        setMessages((prev) => {
-          const exists = prev.some(m => m.message_id === data.message_id || (m.message_id?.startsWith("temp_") && m.content === data.content && m.sender_id === data.sender_id));
-          if (exists) {
-            return prev.map(m => (m.sender_id === data.sender_id && m.content === data.content && m.message_id?.startsWith("temp_")) ? data : m);
-          }
-          return [...prev, data];
-        });
-      };
+        socket.onclose = () => {
+          console.log("Chat WS Disconnected, reconnecting...");
+          reconnectTimeout = setTimeout(connectWS, 3000);
+        };
 
-      socket.onclose = () => console.log("WebSocket Disconnected");
-      setWs(socket);
+        setWs(socket);
+      } catch (err) {
+        reconnectTimeout = setTimeout(connectWS, 5000);
+      }
     };
 
     connectWS();
 
     return () => {
-      if (socket) socket.close();
+      if (socket) {
+        socket.onclose = null; // Detach to avoid triggers
+        socket.close();
+      }
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
     };
   }, [open, conversationId]);
 
