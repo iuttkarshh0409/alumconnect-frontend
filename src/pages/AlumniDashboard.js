@@ -13,6 +13,7 @@ import { useTheme } from "@/components/theme-provider";
 import {
   Users,
   BookOpen,
+  MessageSquare,
   LogOut,
   Edit,
   CheckCircle,
@@ -55,6 +56,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
 import MentorshipRequestCard from "@/components/MentorshipRequestCard";
+import InboxSheet from "@/components/InboxSheet";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -84,6 +86,7 @@ const AlumniDashboard = () => {
   const [radarStudents, setRadarStudents] = useState([]);
   const [wisdomText, setWisdomText] = useState("");
   const [isPostingWisdom, setIsPostingWisdom] = useState(false);
+  const [inboxOpen, setInboxOpen] = useState(false);
   
   // Availability Heatmap State (Mocked)
   const [availability, setAvailability] = useState([true, true, false, true, false, true, true]); // 7 days (S, M, T, W, T, F, S)
@@ -363,6 +366,14 @@ const AlumniDashboard = () => {
 
           <div className="flex items-center gap-4">
             <ThemeToggle />
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setInboxOpen(true)}
+              className="rounded-full w-8 h-8 border-slate-200 dark:border-slate-800 dark:bg-slate-800 flex items-center justify-center p-0"
+            >
+              <MessageSquare className="w-4 h-4 text-slate-600 dark:text-slate-200" />
+            </Button>
             <Button
               variant="ghost"
               size="sm"
@@ -1047,6 +1058,7 @@ const AlumniDashboard = () => {
           </div>
         </div>
       </footer>
+      <InboxSheet open={inboxOpen} onOpenChange={setInboxOpen} />
     </div>
   );
 };
