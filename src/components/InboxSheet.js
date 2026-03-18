@@ -99,9 +99,12 @@ const InboxSheet = ({ open, onOpenChange }) => {
             }
             
             setMessages((prev) => {
-              const exists = prev.some(m => m.message_id === data.message_id || (m.message_id?.startsWith("temp_") && m.content === data.content && m.sender_id === data.sender_id));
-              if (exists) {
-                return prev.map(m => (m.sender_id === data.sender_id && m.content === data.content && m.message_id?.startsWith("temp_")) ? data : m);
+              const isTempExists = prev.some(m => m.message_id?.startsWith("temp_") && m.content === data.content && m.sender_id === data.sender_id);
+              if (isTempExists) {
+                return prev.map(m => (m.message_id?.startsWith("temp_") && m.content === data.content && m.sender_id === data.sender_id) ? data : m);
+              }
+              if (prev.some(m => m.message_id === data.message_id)) {
+                return prev;
               }
               return [...prev, data];
             });
