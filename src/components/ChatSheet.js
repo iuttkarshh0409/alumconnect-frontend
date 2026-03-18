@@ -118,6 +118,25 @@ const ChatSheet = ({ open, onOpenChange, conversationId, otherParticipant }) => 
     }
   }, [messages]);
 
+  useEffect(() => {
+    if (!open || !conversationId || messages.length === 0) return;
+
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg.sender_id !== userId && !lastMsg.read_at) {
+      const markRead = async () => {
+        try {
+          const token = await getToken();
+          await axios.post(`${API_URL}/api/conversations/${conversationId}/read`, {}, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+        } catch (err) {
+          console.error("Failed to mark read", err);
+        }
+      };
+      markRead();
+    }
+  }, [messages.length, open, conversationId, userId]);
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim() || !ws) return;

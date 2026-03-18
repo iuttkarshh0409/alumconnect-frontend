@@ -139,6 +139,25 @@ const InboxSheet = ({ open, onOpenChange }) => {
     }
   }, [messages]);
 
+  useEffect(() => {
+    if (view !== "chat" || !activeConvo || messages.length === 0) return;
+
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg.sender_id !== userId && !lastMsg.read_at) {
+      const markRead = async () => {
+        try {
+          const token = await getToken();
+          await axios.post(`${API_URL}/api/conversations/${activeConvo.conversation_id}/read`, {}, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+        } catch (err) {
+          console.error("Failed to mark read", err);
+        }
+      };
+      markRead();
+    }
+  }, [messages.length, view, activeConvo, userId]);
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim() || !ws) return;
