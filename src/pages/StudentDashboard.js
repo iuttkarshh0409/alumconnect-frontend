@@ -11,6 +11,7 @@ import {
   Users,
   TrendingUp,
   BookOpen,
+  MessageSquare,
   LogOut,
   Search,
   ChevronRight,
@@ -36,6 +37,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
 import MentorshipRequestCard from "@/components/MentorshipRequestCard";
+import InboxSheet from "@/components/InboxSheet";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -70,6 +72,7 @@ const StudentDashboard = () => {
   const [leaderboard, setLeaderboard] = useState([]);
   const [tipIndex, setTipIndex] = useState(0);
   const [proTips, setProTips] = useState(PRO_TIPS);
+  const [inboxOpen, setInboxOpen] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -195,6 +198,14 @@ const StudentDashboard = () => {
           </div>
           <div className="flex items-center gap-4">
             <ThemeToggle />
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setInboxOpen(true)}
+              className="rounded-full w-8 h-8 border-slate-100 dark:border-slate-800 dark:bg-slate-800 flex items-center justify-center p-0"
+            >
+              <MessageSquare className="w-4 h-4 text-slate-600 dark:text-slate-200" />
+            </Button>
             <Button
               variant="ghost"
               onClick={handleLogout}
@@ -447,6 +458,7 @@ const StudentDashboard = () => {
           </aside>
         </div>
       </main>
+      <InboxSheet open={inboxOpen} onOpenChange={setInboxOpen} />
     </div>
   );
 };
