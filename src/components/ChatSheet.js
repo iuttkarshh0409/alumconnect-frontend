@@ -62,7 +62,14 @@ const ChatSheet = ({ open, onOpenChange, conversationId, otherParticipant }) => 
           );
           return;
         }
-        setMessages((prev) => [...prev, data]);
+        
+        setMessages((prev) => {
+          const exists = prev.some(m => m.message_id === data.message_id || (m.message_id?.startsWith("temp_") && m.content === data.content && m.sender_id === data.sender_id));
+          if (exists) {
+            return prev.map(m => (m.sender_id === data.sender_id && m.content === data.content && m.message_id?.startsWith("temp_")) ? data : m);
+          }
+          return [...prev, data];
+        });
       };
 
       socket.onclose = () => console.log("WebSocket Disconnected");
@@ -88,6 +95,17 @@ const ChatSheet = ({ open, onOpenChange, conversationId, otherParticipant }) => 
 
     const payload = { content: newMessage };
     ws.send(JSON.stringify(payload));
+
+    const optimisticMsg = {
+      message_id: `temp_${Date.now()}`,
+      conversation_id: conversationId,
+      sender_id: userId,
+      content: newMessage,
+      created_at: new Date().toISOString(),
+      read_at: null
+    };
+
+    setMessages((prev) => [...prev, optimisticMsg]);
     setNewMessage("");
   };
 
