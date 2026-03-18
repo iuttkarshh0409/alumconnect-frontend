@@ -3,13 +3,34 @@ import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@clerk/clerk-react";
-import { Clock, CheckCircle, XCircle, AlertCircle, Trash2, Calendar } from "lucide-react";
+import { Clock, CheckCircle, XCircle, AlertCircle, Trash2, Calendar, MessageSquare } from "lucide-react";
 import { format } from "date-fns";
+import ChatSheet from "@/components/ChatSheet";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const MentorshipRequestCard = ({ request, userRole, onUpdate }) => {
   const { getToken } = useAuth();
+  const [chatOpen, setChatOpen] = React.useState(false);
+  const [conversationId, setConversationId] = React.useState(null);
+
+  const handleOpenChat = async () => {
+    try {
+      const token = await getToken();
+      const res = await axios.get(`${API_URL}/api/conversations`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const convo = res.data.find((c) => c.request_id === request.request_id);
+      if (convo) {
+        setConversationId(convo.conversation_id);
+        setChatOpen(true);
+      } else {
+        toast.error("Conversation not found");
+      }
+    } catch (error) {
+      toast.error("Failed to load chat setup");
+    }
+  };
 
   const handleUpdateStatus = async (status) => {
     try {
@@ -157,13 +178,29 @@ const MentorshipRequestCard = ({ request, userRole, onUpdate }) => {
       )}
 
       {request.status === "accepted" && displayUser && (
-        <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900/30 rounded-lg p-3 mt-4 transition-colors">
-          <p className="text-sm text-green-800 dark:text-green-400 mb-1 font-bold tracking-tight uppercase text-[10px]">
-            Contact Information
-          </p>
-          <p className="text-sm text-green-700 dark:text-green-300 font-medium">{displayUser.email}</p>
+        <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900/30 rounded-lg p-3 mt-4 transition-colors flex justify-between items-center">
+          <div>
+            <p className="text-sm text-green-800 dark:text-green-400 mb-1 font-bold tracking-tight uppercase text-[10px]">
+              Contact Information
+            </p>
+            <p className="text-sm text-green-700 dark:text-green-300 font-medium">{displayUser.email}</p>
+          </div>
+          <Button
+            size="sm"
+            onClick={handleOpenChat}
+            className="rounded-full bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+          >
+            <MessageSquare className="w-4 h-4" />
+            Message
+          </Button>
         </div>
       )}
+      <ChatSheet
+        open={chatOpen}
+        onOpenChange={setChatOpen}
+        conversationId={conversationId}
+        otherParticipant={displayUser}
+      />
     </div>
   );
 };
