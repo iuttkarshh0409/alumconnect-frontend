@@ -22,6 +22,8 @@ const ChatSheet = ({ open, onOpenChange, conversationId, otherParticipant }) => 
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef(null);
   const [ws, setWs] = useState(null);
+  const [isOtherTyping, setIsOtherTyping] = useState(false);
+  const typingTimeoutRef = useRef(null);
 
   const fetchMessages = async () => {
     try {
@@ -51,6 +53,14 @@ const ChatSheet = ({ open, onOpenChange, conversationId, otherParticipant }) => 
 
       socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
+        
+        if (data.type === "typing") {
+          if (data.sender_id !== userId) {
+            setIsOtherTyping(data.is_typing);
+          }
+          return;
+        }
+
         if (data.type === "read_receipt") {
           // Update reads dynamically
           setMessages((prev) =>
@@ -92,6 +102,9 @@ const ChatSheet = ({ open, onOpenChange, conversationId, otherParticipant }) => 
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim() || !ws) return;
+
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    ws.send(JSON.stringify({ type: "typing", is_typing: false }));
 
     const payload = { content: newMessage };
     ws.send(JSON.stringify(payload));
@@ -156,16 +169,38 @@ const ChatSheet = ({ open, onOpenChange, conversationId, otherParticipant }) => 
           </div>
         </ScrollArea>
 
-        <form onSubmit={handleSendMessage} className="p-4 border-t border-slate-100 dark:border-slate-800 flex gap-2">
-          <Input
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type your message..."
-            className="flex-1 rounded-full text-sm h-9 dark:bg-slate-900 border-slate-200 dark:border-slate-800"
-          />
-          <Button type="submit" size="icon" className="rounded-full h-9 w-9 bg-[#002147] hover:bg-[#002147]/90 text-white">
-            <Send className="w-4 h-4" />
-          </Button>
+        <form onSubmit={handleSendMessage} className="p-4 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2">
+          {isOtherTyping && (
+            <div className="flex justify-start px-2 mb-1">
+              <div className="bg-slate-100 dark:bg-slate-900/50 rounded-2xl px-3 py-1 text-[10px] text-slate-500 flex items-center gap-1 font-bold tracking-tight">
+                <div className="flex gap-1 items-center">
+                  <div className="w-1 h-1 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <div className="w-1 h-1 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <div className="w-1 h-1 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                </div>
+                <span>Typing...</span>
+              </div>
+            </div>
+          )}
+          <div className="flex gap-2">
+            <Input
+              value={newMessage}
+              onChange={(e) => {
+                setNewMessage(e.target.value);
+                if (!ws) return;
+                ws.send(JSON.stringify({ type: "typing", is_typing: true }));
+                if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+                typingTimeoutRef.current = setTimeout(() => {
+                  if (ws) ws.send(JSON.stringify({ type: "typing", is_typing: false }));
+                }, 1500);
+              }}
+              placeholder="Type your message..."
+              className="flex-1 rounded-full text-sm h-9 dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+            />
+            <Button type="submit" size="icon" className="rounded-full h-9 w-9 bg-[#002147] hover:bg-[#002147]/90 text-white">
+              <Send className="w-4 h-4" />
+            </Button>
+          </div>
         </form>
       </SheetContent>
     </Sheet>
