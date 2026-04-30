@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import {
   Sheet,
   SheetContent,
@@ -27,7 +27,7 @@ const InboxSheet = ({ open, onOpenChange }) => {
   const [isOtherTyping, setIsOtherTyping] = useState(false);
   const typingTimeoutRef = useRef(null);
 
-  const fetchConversations = async () => {
+  const fetchConversations = useCallback(async () => {
     try {
       const token = await getToken();
       const res = await axios.get(`${API_URL}/api/conversations`, {
@@ -37,9 +37,9 @@ const InboxSheet = ({ open, onOpenChange }) => {
     } catch (error) {
       console.error("Failed to fetch conversations", error);
     }
-  };
+  }, [getToken]);
 
-  const fetchMessages = async (conversationId) => {
+  const fetchMessages = useCallback(async (conversationId) => {
     try {
       const token = await getToken();
       const res = await axios.get(
@@ -50,13 +50,13 @@ const InboxSheet = ({ open, onOpenChange }) => {
     } catch (error) {
        console.error("Failed to fetch messages", error);
     }
-  };
+  }, [getToken]);
 
   useEffect(() => {
     if (open && view === "list") {
       fetchConversations();
     }
-  }, [open, view]);
+  }, [open, view, fetchConversations]);
 
   useEffect(() => {
     if (view !== "chat" || !activeConvo) return;
@@ -134,7 +134,7 @@ const InboxSheet = ({ open, onOpenChange }) => {
       }
       if (reconnectTimeout) clearTimeout(reconnectTimeout);
     };
-  }, [view, activeConvo]);
+  }, [view, activeConvo, fetchMessages, getToken, userId]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -159,7 +159,7 @@ const InboxSheet = ({ open, onOpenChange }) => {
       };
       markRead();
     }
-  }, [messages.length, view, activeConvo, userId]);
+  }, [messages, view, activeConvo, userId, getToken]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();

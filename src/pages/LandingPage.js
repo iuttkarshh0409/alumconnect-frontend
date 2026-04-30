@@ -1,7 +1,8 @@
 import { useUser } from '@clerk/clerk-react';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import React from 'react';
+import Chatbot from '../components/Chatbot/Chatbot';
+
 import { ArrowRight, Users, TrendingUp, Award, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 import iips from './iips.jpeg';
@@ -207,6 +208,7 @@ const handleLogin = () => {
           </div>
         </div>
       </footer>
+      <Chatbot />
     </div>
   );
 };

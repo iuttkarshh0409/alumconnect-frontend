@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import {
   Sheet,
   SheetContent,
@@ -25,7 +25,7 @@ const ChatSheet = ({ open, onOpenChange, conversationId, otherParticipant }) => 
   const [isOtherTyping, setIsOtherTyping] = useState(false);
   const typingTimeoutRef = useRef(null);
 
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     try {
       setLoading(true);
       const token = await getToken();
@@ -39,7 +39,7 @@ const ChatSheet = ({ open, onOpenChange, conversationId, otherParticipant }) => 
     } finally {
       setLoading(false);
     }
-  };
+  }, [conversationId, getToken]);
 
   useEffect(() => {
     if (!open || !conversationId) return;
@@ -113,7 +113,7 @@ const ChatSheet = ({ open, onOpenChange, conversationId, otherParticipant }) => 
       }
       if (reconnectTimeout) clearTimeout(reconnectTimeout);
     };
-  }, [open, conversationId]);
+  }, [open, conversationId, fetchMessages, getToken, userId]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -138,7 +138,7 @@ const ChatSheet = ({ open, onOpenChange, conversationId, otherParticipant }) => 
       };
       markRead();
     }
-  }, [messages.length, open, conversationId, userId]);
+  }, [messages, open, conversationId, userId, getToken]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
