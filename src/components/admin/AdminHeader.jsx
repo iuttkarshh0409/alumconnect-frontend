@@ -23,14 +23,23 @@ const AdminHeader = () => {
           AlumConnect Admin
         </h1>
 
-        <Button
-          variant="ghost"
-          onClick={handleLogout}
-          className="text-slate-600 hover:text-[#002147]"
-        >
-          <LogOut className="w-5 h-5 mr-2" />
-          Logout
-        </Button>
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/community")}
+            className="text-slate-600 hover:text-[#002147]"
+          >
+            Community
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={handleLogout}
+            className="text-slate-600 hover:text-[#002147]"
+          >
+            <LogOut className="w-5 h-5 mr-2" />
+            Logout
+          </Button>
+        </div>
       </div>
     </div>
   );

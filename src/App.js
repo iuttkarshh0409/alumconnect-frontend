@@ -19,6 +19,7 @@ import AnalyticsDashboard from "./pages/AnalyticsDashboard";
 import AdminDashboard from './pages/AdminDashboard';
 import AlumniDirectory from './pages/AlumniDirectory';
 import ProfilePage from './pages/ProfilePage';
+import CommunityPage from './pages/CommunityPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function AppRouter() {
@@ -103,24 +104,38 @@ function AppRouter() {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="/community"
+        element={
+          <ProtectedRoute>
+            <CommunityPage />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }
 
 
 import { ThemeProvider } from './components/theme-provider';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="alumconnect-theme">
-      <ClerkProvider publishableKey={process.env.REACT_APP_CLERK_PUBLISHABLE_KEY}>
-      <div className="App">
-        <BrowserRouter>
-          <AppRouter />
-          <Toaster position="top-right" />
-        </BrowserRouter>
-      </div>
-      </ClerkProvider>
+      <QueryClientProvider client={queryClient}>
+        <ClerkProvider publishableKey={process.env.REACT_APP_CLERK_PUBLISHABLE_KEY}>
+        <div className="App">
+          <BrowserRouter>
+            <AppRouter />
+            <Toaster position="top-right" />
+          </BrowserRouter>
+        </div>
+        </ClerkProvider>
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }

@@ -201,6 +201,15 @@ const StudentDashboard = () => {
             <Button
               variant="outline"
               size="icon"
+              onClick={() => navigate("/community")}
+              className="rounded-full w-8 h-8 border-slate-100 dark:border-slate-800 dark:bg-slate-800 flex items-center justify-center p-0"
+              title="Community Feed"
+            >
+              <Users className="w-4 h-4 text-slate-600 dark:text-slate-200" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
               onClick={() => setInboxOpen(true)}
               className="rounded-full w-8 h-8 border-slate-100 dark:border-slate-800 dark:bg-slate-800 flex items-center justify-center p-0"
             >
